@@ -122,7 +122,7 @@ function ProductEditScreen() {
                             </Form.Control>
                         </Form.Group>
 
-                        <Form.Group controlId='price'>
+                        {/* <Form.Group controlId='price'>
                             <Form.Label>Price</Form.Label>
                             <Form.Control
 
@@ -132,7 +132,7 @@ function ProductEditScreen() {
                                 onChange={(e) => setPrice(e.target.value)}
                             >
                             </Form.Control>
-                        </Form.Group>
+                        </Form.Group> */}
 
 
                         <Form.Group controlId='image'>

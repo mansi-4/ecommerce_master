@@ -9,4 +9,10 @@ urlpatterns=[
     path('<str:pk>', views.getProduct,name="product"),
     path('update/<str:pk>/',views.updateProduct,name="product-update"),
     path('delete/<str:pk>/',views.deleteProduct,name="product-delete"), 
+    path('<str:pk>/variation/',views.createProductVariation,name="variation-create"),
+    path('update/variation/<str:pk>/',views.updateProductVariation,name="variation-update"),
+    path('delete/variation/<str:pk>/',views.deleteProductVariation,name="variation-delete"), 
+
+
+
 ]

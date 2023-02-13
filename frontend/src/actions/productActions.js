@@ -35,7 +35,7 @@ import {
 export const listProducts = (keyword='') => async (dispatch) => {
     try{
         dispatch({type:PRODUCT_LIST_REQUEST})
-        const {data} = await axios.get(`http://localhost:8003/api/products/${keyword}`)
+        const {data} = await axios.get(`/api/products/${keyword}`)
         dispatch({
             type:PRODUCT_LIST_SUCCESS,
             payload:data
@@ -55,7 +55,7 @@ export const listTopProducts = () => async (dispatch) => {
     try {
         dispatch({ type: PRODUCT_TOP_REQUEST })
 
-        const { data } = await axios.get(`http://localhost:8003/api/products/top/`)
+        const { data } = await axios.get(`/api/products/top/`)
 
         dispatch({
             type: PRODUCT_TOP_SUCCESS,
@@ -105,8 +105,7 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
 
         const config = {
             headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${userInfo.token}`
+                Authorization: userInfo.token
             }
         }
 
