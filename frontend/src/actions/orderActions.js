@@ -50,7 +50,7 @@ export const createOrder = (order) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.post(
-            `/api/orders/add/`,
+            `http://localhost:8003/api/orders/add/`,
             order,
             config
         )
@@ -98,7 +98,7 @@ export const getOrderDetails = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.get(
-            `/api/orders/${id}/`,
+            `http://localhost:8003/api/orders/${id}/`,
             config
         )
 
@@ -134,7 +134,7 @@ export const payOrder = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.put(
-            `/api/orders/${id}/pay/`,
+            `http://localhost:8003/api/orders/${id}/pay/`,
             {},
             config
         )
@@ -172,7 +172,7 @@ export const deliverOrder = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.put(
-            `/api/orders/${id}/deliver/`,
+            `http://localhost:8003/api/orders/${id}/deliver/`,
             {},
             config
         )
@@ -210,7 +210,7 @@ export const listMyOrders = () => async (dispatch, getState) => {
         }
 
         const { data } = await axios.get(
-            `/api/orders/myorders/`,
+            `http://localhost:8003/api/orders/myorders/`,
             config
         )
 
@@ -246,7 +246,7 @@ export const listOrders = () => async (dispatch, getState) => {
         }
 
         const { data } = await axios.get(
-            `/api/orders/`,
+            `http://localhost:8003/api/orders/`,
             config
         )
         dispatch({

@@ -17,6 +17,10 @@ import UserListScreen from './screens/UserListScreen'
 import UserEditScreen from './screens/UserEditScreen'
 import ColorListScreen from './screens/ColorListScreen'
 import ColorEditScreen from './screens/ColorEditScreen'
+import SizeListScreen from './screens/SizeListScreen'
+import SizeEditScreen from './screens/SizeEditScreen'
+import CategoryListScreen from './screens/CategoryListScreen'
+import CategoryEditScreen from './screens/CategoryEditScreen'
 import ProductListScreen from './screens/ProductListScreen'
 import ProductEditScreen from './screens/ProductEditScreen'
 
@@ -44,6 +48,11 @@ function App() {
             <Route path="/admin/user/:id/edit" element={<UserEditScreen/>}/>
             <Route path="/admin/colorlist" element={<ColorListScreen/>}/>
             <Route path="/admin/color/:id/edit" element={<ColorEditScreen/>}/>
+            <Route path="/admin/sizelist" element={<SizeListScreen/>}/>
+            <Route path="/admin/size/:id/edit" element={<SizeEditScreen/>}/>
+            <Route path="/admin/categorylist" element={<CategoryListScreen/>}/>
+            <Route path="/admin/category/:id/edit" element={<CategoryEditScreen/>}/>
+
             <Route path="/admin/productlist" element={<ProductListScreen/>}/>
             <Route path="/admin/product/:id/edit" element={<ProductEditScreen/>}/>
             <Route path="/admin/orderlist" element={<OrderListScreen/>}/>

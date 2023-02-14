@@ -6,59 +6,59 @@ import { Table, Button, Row,Col} from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
-import { listColors,deleteColor,createColor } from '../actions/colorActions'
-import {COLOR_CREATE_RESET} from "../constants/colorConstants"
-function ColorListScreen() {
+import { listCategories,deleteCategory,createCategory } from '../actions/categoryActions'
+import {CATEGORY_CREATE_RESET} from "../constants/categoryConstants"
+function CategoryListScreen() {
     let history=useNavigate()
     const dispatch = useDispatch()
 
-    const colorList = useSelector(state => state.colorList)
-    const { loading, error, colors } = colorList
+    const categoryList = useSelector(state => state.categoryList)
+    const { loading, error, categories } = categoryList
 
     const userLogin = useSelector(state => state.userLogin)
     const { userInfo } = userLogin
 
-    const colorDelete = useSelector(state => state.colorDelete)
-    const { loading: loadingDelete, error: errorDelete, success: successDelete } = colorDelete
+    const categoryDelete = useSelector(state => state.categoryDelete)
+    const { loading: loadingDelete, error: errorDelete, success: successDelete } = categoryDelete
 
-    const colorCreate = useSelector(state => state.colorCreate)
-    const { loading: loadingCreate, error: errorCreate, success: successCreate, color: createdColor } = colorCreate
+    const categoryCreate = useSelector(state => state.categoryCreate)
+    const { loading: loadingCreate, error: errorCreate, success: successCreate, category: createdCategory } = categoryCreate
 
 
     useEffect(() => {
-        dispatch({ type: COLOR_CREATE_RESET })
+        dispatch({ type: CATEGORY_CREATE_RESET })
         if (!userInfo.isAdmin) {
             history('/login')
         }
         if (successCreate) { 
-            history(`/admin/color/${createdColor.id}/edit`)
+            history(`/admin/category/${createdCategory.id}/edit`)
         }else {
-            dispatch(listColors())
+            dispatch(listCategories())
         }
 
-    }, [dispatch, history, successDelete,successCreate,userInfo,createdColor])
+    }, [dispatch, history, successDelete,successCreate,userInfo,createdCategory])
 
 
     const deleteHandler = (id) => {
 
-        if (window.confirm('Are you sure you want to delete this color?')) {
-            dispatch(deleteColor(id))
+        if (window.confirm('Are you sure you want to delete this category?')) {
+            dispatch(deleteCategory(id))
         }
     }
-    const createColorHandler = () => {
+    const createCategoryHandler = () => {
         // create product
-        dispatch(createColor())
+        dispatch(createCategory())
     }
     return (
         <div>
            <Row className='align-items-center'>
                 <Col md={10}>
-                    <h1>Colors</h1>
+                    <h1>Categories</h1>
                 </Col>
 
                 <Col md={2}>
-                    <Button className='my-3' onClick={createColorHandler}>
-                        <i className='fas fa-plus'></i> Create Color
+                    <Button className='my-3' onClick={createCategoryHandler}>
+                        <i className='fas fa-plus'></i> Create category
                     </Button>
                 </Col>
             </Row>
@@ -76,27 +76,27 @@ function ColorListScreen() {
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>COLOR</th>
+                                    <th>CATEGORY</th>
                                         
                                 </tr>
                             </thead>
 
                             <tbody>
-                                {colors.map(color => (
-                                    <tr key={color.id}>
-                                        <td>{color.id}</td>
-                                        <td>{color.color}</td>
+                                {categories.map(category => (
+                                    <tr key={category.id}>
+                                        <td>{category.id}</td>
+                                        <td>{category.category}</td>
                                         
                                         
 
                                         <td>
-                                            <LinkContainer to={`/admin/color/${color.id}/edit`}>
+                                            <LinkContainer to={`/admin/category/${category.id}/edit`}>
                                                 <Button variant='light' className='btn-sm'>
                                                     <i className='fas fa-edit'></i>
                                                 </Button>
                                             </LinkContainer>
 
-                                            <Button variant='danger' className='btn-sm' onClick={() => deleteHandler(color.id)}>
+                                            <Button variant='danger' className='btn-sm' onClick={() => deleteHandler(category.id)}>
                                                 <i className='fas fa-trash'></i>
                                             </Button>
                                         </td>
@@ -109,4 +109,4 @@ function ColorListScreen() {
     )
 }
 
-export default ColorListScreen
+export default CategoryListScreen

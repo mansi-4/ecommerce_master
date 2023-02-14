@@ -54,6 +54,12 @@ function Header() {
                 <LinkContainer to='/admin/colorlist'>
                     <NavDropdown.Item>Colors</NavDropdown.Item>
                 </LinkContainer>
+                <LinkContainer to='/admin/sizelist'>
+                    <NavDropdown.Item>Sizes</NavDropdown.Item>
+                </LinkContainer>
+                <LinkContainer to='/admin/categorylist'>
+                    <NavDropdown.Item>Categories</NavDropdown.Item>
+                </LinkContainer>
                 <LinkContainer to='/admin/productlist'>
                     <NavDropdown.Item>Products</NavDropdown.Item>
                 </LinkContainer>

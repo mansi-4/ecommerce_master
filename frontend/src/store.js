@@ -5,6 +5,8 @@ import {productListReducer,productTopRatedReducer,productDetailsReducer,productD
 import {cartReducer} from './reducers/cartReducers'
 import {userLoginReducer,userRegisterReducer,userDetailsReducer,userUpdateProfileReducer,userListReducer,userDeleteReducer,userUpdateReducer} from './reducers/userReducers'
 import {colorListReducer,colorDetailsReducer,colorCreateReducer,colorDeleteReducer,colorUpdateReducer} from "./reducers/colorReducers"
+import {sizeListReducer,sizeDetailsReducer,sizeCreateReducer,sizeDeleteReducer,sizeUpdateReducer} from "./reducers/sizeReducers"
+import {categoryListReducer,categoryDetailsReducer,categoryCreateReducer,categoryDeleteReducer,categoryUpdateReducer} from "./reducers/categoryReducers"
 import {orderCreateReducer,orderDetailsReducer,orderPayReducer,orderListMyReducer,orderListReducer,orderDeliverReducer} from './reducers/orderReducers'
 const reducer=combineReducers({
     productList:productListReducer,
@@ -14,7 +16,9 @@ const reducer=combineReducers({
     productCreate:productCreateReducer,
     productUpdate:productUpdateReducer,
     productReviewCreate:productReviewCreateReducer,
+
     cart:cartReducer,
+    
     userLogin:userLoginReducer,
     userRegister:userRegisterReducer,
     userDetails:userDetailsReducer,
@@ -22,11 +26,25 @@ const reducer=combineReducers({
     userList:userListReducer,
     userDelete:userDeleteReducer,
     userUpdate:userUpdateReducer,
+
     colorList:colorListReducer,
     colorCreate:colorCreateReducer,
     colorDelete:colorDeleteReducer,
     colorUpdate:colorUpdateReducer,
     colorDetails:colorDetailsReducer,
+
+    sizeList:sizeListReducer,
+    sizeCreate:sizeCreateReducer,
+    sizeDelete:sizeDeleteReducer,
+    sizeUpdate:sizeUpdateReducer,
+    sizeDetails:sizeDetailsReducer,
+
+    categoryList:categoryListReducer,
+    categoryCreate:categoryCreateReducer,
+    categoryDelete:categoryDeleteReducer,
+    categoryUpdate:categoryUpdateReducer,
+    categoryDetails:categoryDetailsReducer,
+
     orderCreate:orderCreateReducer,
     orderDetails:orderDetailsReducer,
     orderPay:orderPayReducer,

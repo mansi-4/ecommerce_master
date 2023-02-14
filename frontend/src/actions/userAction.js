@@ -46,7 +46,7 @@ export const login = (email,password) => async (dispatch) => {
             }
         }
         const {data} = await axios.post(
-            "/api/users/login",
+            "http://localhost:8003/api/users/login",
             {'email':email,'password':password},
             config
             )
@@ -94,7 +94,7 @@ export const register = (name, email, password) => async (dispatch) => {
         
 
         const { data } = await axios.post(
-            '/api/users/register',
+            'http://localhost:8003/api/users/register',
             { 'name': name, 'email': email, 'password': password },
         )
 
@@ -137,7 +137,7 @@ export const getUserDetails = (id) => async (dispatch,getState) => {
         }
         console.log(userInfo.token)
         const { data } = await axios.get(
-            `/api/users/${id}`,
+            `http://localhost:8003/api/users/${id}`,
             config
         )
 
@@ -173,7 +173,7 @@ export const updateUserProfile = (user) => async (dispatch,getState) => {
         }
         console.log(user)
         const { data } = await axios.put(
-            `/api/users/profile_update/`,
+            `http://localhost:8003/api/users/profile_update/`,
             user,
             config
         )
@@ -218,7 +218,7 @@ export const listUsers = () => async (dispatch, getState) => {
         }
 
         const { data } = await axios.get(
-            `/api/users/`,
+            `http://localhost:8003/api/users/`,
             config
         )
 
@@ -256,7 +256,7 @@ export const deleteUser = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.delete(
-            `/api/users/delete/${id}/`,
+            `http://localhost:8003/api/users/delete/${id}/`,
             config
         )
 
@@ -294,7 +294,7 @@ export const updateUser = (user) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.put(
-            `/api/users/update/${user._id}/`,
+            `http://localhost:8003/api/users/update/${user._id}/`,
             user,
             config
         )
