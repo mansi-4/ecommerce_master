@@ -186,7 +186,7 @@ function OrderScreen() {
                                     </ListGroup.Item>
                                 )}
                             </Card>
-                        </Col>
+                    </Col>
             </Row>
             </div>
         )

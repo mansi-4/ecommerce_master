@@ -55,7 +55,7 @@ function SizeEditScreen() {
     
     return (
         <div>
-            <Link to='/admin/productlist'>
+            <Link to='/admin/sizelist'>
                 Go Back
             </Link>
 

@@ -2,8 +2,8 @@ import React,{useState,useEffect} from 'react'
 import {Link,useParams,useNavigate } from 'react-router-dom'
 import {Row,Col,Image,ListGroup,Button,Card,Form} from 'react-bootstrap'
 import { useDispatch,useSelector } from 'react-redux'
-import { listProductDetails,createProductReview } from '../actions/productActions'
-import {PRODUCT_CREATE_REVIEW_RESET} from '../constants/productConstants'
+import { listProductDetails,createProductReview, listDistinctProductDetails, listProductSizesByColor, listProductVariationBySize } from '../actions/productActions'
+import {PRODUCT_CREATE_REVIEW_RESET,PRODUCT_SIZE_BY_COLOR_RESET} from '../constants/productConstants'
 import Loader from "../components/Loader"
 import Message from "../components/Message"
 import Rating from '../components/Rating'
@@ -15,10 +15,23 @@ function ProductScreen() {
     // to match url id with product id from array
     const { id } = useParams();
     const dispatch=useDispatch()
-    const productDetails = useSelector(state=>state.productDetails)
-    const {error,loading,product}= productDetails
+    const productDistinctDetails = useSelector(state=>state.productDistinctDetails)
+    const {error,loading,product}= productDistinctDetails
 
-   
+    const productSizesByColor = useSelector(state=>state.productSizesByColor)
+    const {error:errorProductSizesByColor,loading:loadingProductSizesByColor,sizes}= productSizesByColor
+
+    const productVariationBySize = useSelector(state=>state.productVariationBySize)
+    const {error:errorProductVariationBySize,loading:loadingProductVariationBySize,variation}= productVariationBySize
+
+    const [images,setImages]=useState([]);
+    const [colors,setColors]=useState([]);
+    
+    const [color_id,setColorId]=useState("")
+    const [size_id,setSizeId]=useState("")
+    const [price,setPrice]=useState(0)
+    const [stock,setStock]=useState(0)
+    
 
     const userLogin = useSelector(state => state.userLogin)
     const { userInfo } = userLogin
@@ -30,15 +43,24 @@ function ProductScreen() {
         success: successProductReview,
     } = productReviewCreate
 
+    
     useEffect(()=>{
         if (successProductReview) {
             setRating(0)
             setComment('')
             dispatch({ type: PRODUCT_CREATE_REVIEW_RESET })
+        }else{
+            if(Number(id)!==product.product_id){
+                dispatch(listDistinctProductDetails(id))
+            }
+            else{
+                setImages(product.images)
+                setColors(product.colors)
+                
+            }
         }
-        dispatch(listProductDetails(id))
-    },[dispatch,successProductReview,id])
-
+    },[dispatch,successProductReview,id,product,color_id,size_id,sizes,variation])
+    // 
     // add to cart quantity
     const [qty,setQty] = useState(1)
     let history=useNavigate();
@@ -56,6 +78,30 @@ function ProductScreen() {
         }
         ))
     }
+    function handleColorChange(e){
+        console.log("handle color")
+        setColorId(e.target.value)
+        const obj={
+            "color_id":e.target.value,
+            "product_id":id
+        }
+        dispatch({type:PRODUCT_SIZE_BY_COLOR_RESET})
+        setSizeId("")
+        dispatch(listProductSizesByColor(obj))
+    }
+    function handleSizeChange(e){
+        setSizeId(e.target.value)
+        const obj={
+            "size_id":e.target.value,
+            "product_id":id
+        }
+        dispatch(listProductVariationBySize(obj))
+    }
+    var ProductImg =document.getElementById("ProductImg");
+    var SmallImg= document.getElementsByClassName("small-img");
+    function handleClick(e){
+        ProductImg.src=e.target.src
+    }
     
   return (
     <div>
@@ -66,55 +112,84 @@ function ProductScreen() {
                 (
                     <div>
                     <Row>
-                        <Col md={6}>
-                            <Image src={`http://localhost:8003/${product.image}`} alt={product.name} fluid/>
+                        <Col md={5}>
+                            <div>
+                            <img src={`http://localhost:8003/${images[0]}`} style={{ width: '100%',height:'100%'}} id="ProductImg"/>
+
+                                <div className='small-img-row'>
+                                    {images.map((image,index)=>(
+                                        <div className='small-img-col'>
+                                            <img src={`http://localhost:8003/${image}`} onClick={handleClick} style={{ width: '100%'}}  className="small-img" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </Col>
-                        <Col md={3}>
+                        <Col md={4}>
                             <ListGroup variant="flush">
                                 <ListGroup.Item>
                                     <h3>{product.name}</h3>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
+                                    <h5>{product.brand}</h5>
+                                </ListGroup.Item>
+                                <ListGroup.Item>
                                     <Rating value={product.rating} text={`${product.num_reviews} reviews`} color={'#f8e825'}/>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
-                                    Price: ${product.price}
+                                    <Form.Select name="color_id" value={color_id} onChange={(e)=>handleColorChange(e)}>
+                                        <option >Colors</option>
+                                        {colors.map((color,index)=>(
+                                            <option value={color.color_id}>{color.color}</option>
+                                        ))}
+                                    </Form.Select>
+                                </ListGroup.Item>
+                                <ListGroup.Item>
+                                    <Form.Select name="size_id" value={size_id} onChange={(e)=>handleSizeChange(e)}>
+                                        <option>Size</option>
+                                        {sizes.map((size,index)=>(
+                                            <option value={size.size_id}>{size.size}</option>
+                                        ))}
+                                    </Form.Select>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
                                     Description: {product.description}
                                 </ListGroup.Item>
                             </ListGroup>
                         </Col>
-                        <Col md={3}>
+                        {Object.keys(variation).length!==0 && size_id > 0? (
+                            <Col md={3}>
                             <Card>
                             <ListGroup variant="flush">
+                                    {variation.price===0 ? (""):(
                                     <ListGroup.Item>
                                         <Row>
                                             <Col>Price:</Col>
                                             <Col>
-                                                <strong>${product.price}</strong>    
+                                                <strong>&#8377; {variation.price}</strong>
                                             </Col>
                                         </Row>
-                                    </ListGroup.Item>
+                                    </ListGroup.Item>)}
+                                    
                                     <ListGroup.Item>
                                         <Row>
                                             <Col>Status:</Col>
                                             <Col>
-                                                {product.countInStock>0?'In Stock':'Out Of Stock'}    
+                                            {variation.countInStock>0? "In Stock" : "Out of Stock"}
                                             </Col>
                                         </Row>
                                     </ListGroup.Item>
                                     {/* to make select qty dropdown dynamic */}
-                                    {product.countInStock > 0 && (
+                                    {variation.countInStock > 0 && (
                                         <ListGroup.Item>
                                             <Row>
                                                 <Col>Qty</Col>
-                                                <Col xs="auto" className="my-1">
+                                                <Col  className='my-1'>
                                                     <Form.Control as="select" 
                                                         value={qty} 
                                                         onChange={(e)=>setQty(e.target.value)}>
                                                         {
-                                                            [...Array(product.countInStock).keys()].map((x)=>(
+                                                            [...Array(variation.countInStock).keys()].map((x)=>(
                                                                 <option key={x+1} value={x+1}>
                                                                     {x+1}
                                                                 </option>
@@ -126,11 +201,13 @@ function ProductScreen() {
                                         </ListGroup.Item>
                                     )}
                                     <ListGroup.Item className="text-center">
-                                        <Button onClick={addToCartHandler} className='btn btn-block' disabled={product.countInStock == 0} type='button'>Add to Cart</Button>
+                                        <Button onClick={addToCartHandler} className='btn btn-block' disabled={variation.countInStock == 0} type='button'>Add to Cart</Button>
                                     </ListGroup.Item>
                             </ListGroup>
                             </Card>
-                        </Col>
+                            </Col>
+                        ):("")}
+                        
                     </Row>
                     <Row>
                                 <Col md={6} className="mt-3">

@@ -1,7 +1,7 @@
 import {legacy_createStore as createStore ,combineReducers,applyMiddleware} from 'redux'
 import thunk from 'redux-thunk'
 import {composeWithDevTools} from 'redux-devtools-extension'
-import {productListReducer,productTopRatedReducer,productDetailsReducer,productDeleteReducer,productCreateReducer,productUpdateReducer,productReviewCreateReducer} from './reducers/productReducers'
+import {productListReducer,productTopRatedReducer,productDetailsReducer,productDistinctDetailsReducer,productSizesByColorReducer,productVariationBySizeReducer,productVariationDetailsReducer,productVariationDetailReducer,productDeleteReducer,productVariationDeleteReducer,productCreateReducer,productVariationCreateReducer,productUpdateReducer,productVariationUpdateReducer,productReviewCreateReducer} from './reducers/productReducers'
 import {cartReducer} from './reducers/cartReducers'
 import {userLoginReducer,userRegisterReducer,userDetailsReducer,userUpdateProfileReducer,userListReducer,userDeleteReducer,userUpdateReducer} from './reducers/userReducers'
 import {colorListReducer,colorDetailsReducer,colorCreateReducer,colorDeleteReducer,colorUpdateReducer} from "./reducers/colorReducers"
@@ -12,9 +12,17 @@ const reducer=combineReducers({
     productList:productListReducer,
     productTopRated:productTopRatedReducer,
     productDetails:productDetailsReducer,
+    productDistinctDetails:productDistinctDetailsReducer,
+    productSizesByColor:productSizesByColorReducer,
+    productVariationBySize:productVariationBySizeReducer,
+    productVariationDetails:productVariationDetailsReducer,
+    productVariationDetail:productVariationDetailReducer,
     productDelete:productDeleteReducer,
+    productVariationDelete:productVariationDeleteReducer,
     productCreate:productCreateReducer,
+    productVariationCreate:productVariationCreateReducer,
     productUpdate:productUpdateReducer,
+    productVariationUpdate:productVariationUpdateReducer,
     productReviewCreate:productReviewCreateReducer,
 
     cart:cartReducer,

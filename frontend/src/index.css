@@ -43,8 +43,21 @@ h3{
 .carousel a {
   margin: 0 auto;
 }
+
 @media (max-width: 900px) {
   .carousel-caption h2 {
     font-size: 2.5vw;
   }
+}
+
+/* product img gallery */
+.small-img-row{
+  display:flex;
+  /* justify-content: space-between; */
+  margin-top: 5px;
+}
+.small-img-col{
+  flex-basis: 24%;
+  margin-left: 5px;
+  cursor: pointer;
 }

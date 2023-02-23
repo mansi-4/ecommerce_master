@@ -21,6 +21,7 @@ import SizeListScreen from './screens/SizeListScreen'
 import SizeEditScreen from './screens/SizeEditScreen'
 import CategoryListScreen from './screens/CategoryListScreen'
 import CategoryEditScreen from './screens/CategoryEditScreen'
+import ProductCreateScreen from './screens/ProductCreateScreen'
 import ProductListScreen from './screens/ProductListScreen'
 import ProductEditScreen from './screens/ProductEditScreen'
 
@@ -52,7 +53,7 @@ function App() {
             <Route path="/admin/size/:id/edit" element={<SizeEditScreen/>}/>
             <Route path="/admin/categorylist" element={<CategoryListScreen/>}/>
             <Route path="/admin/category/:id/edit" element={<CategoryEditScreen/>}/>
-
+            <Route path="/admin/productcreate" element={<ProductCreateScreen/>}/>
             <Route path="/admin/productlist" element={<ProductListScreen/>}/>
             <Route path="/admin/product/:id/edit" element={<ProductEditScreen/>}/>
             <Route path="/admin/orderlist" element={<OrderListScreen/>}/>

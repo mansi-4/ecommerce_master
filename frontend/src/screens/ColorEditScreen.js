@@ -55,7 +55,7 @@ function ColorEditScreen() {
     
     return (
         <div>
-            <Link to='/admin/productlist'>
+            <Link to='/admin/colorlist'>
                 Go Back
             </Link>
 

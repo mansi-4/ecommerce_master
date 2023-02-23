@@ -19,7 +19,6 @@ function HomeScreen() {
     // page,
     // pages
   }= productList
-  console.log(productList)
   let keyword=location.search
   useEffect(()=>{
    dispatch(listProducts(keyword))
@@ -32,7 +31,7 @@ function HomeScreen() {
         :error ? <Message variant="danger">{error}</Message>
           :
           <div>
-          <Row>
+          <Row className='gy-4'>
           {products.map(product=>(
               <Col sm={12} md={6} lg={4} xl={3} key={product.product_id}>
                   {/* creating component for products and passing products array as prop */}

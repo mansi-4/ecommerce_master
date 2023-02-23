@@ -55,7 +55,7 @@ function CategoryEditScreen() {
     
     return (
         <div>
-            <Link to='/admin/productlist'>
+            <Link to='/admin/categorylist'>
                 Go Back
             </Link>
 

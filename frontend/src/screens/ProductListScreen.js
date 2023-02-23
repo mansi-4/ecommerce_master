@@ -47,12 +47,13 @@ function ProductListScreen() {
 
     const createProductHandler = (product) => {
         // create product
-        dispatch(createProduct())
+        // dispatch(createProduct())
+        history("/admin/productcreate")
     }
 
     return (
         <div>
-            <Row className='align-items-center'>
+            <Row className='align-items-center'> 
                 <Col md={10}>
                     <h1>Products</h1>
                 </Col>
@@ -78,7 +79,6 @@ function ProductListScreen() {
                                 <tr>                                
                                     <th>ID</th>
                                     <th>NAME</th>
-                                    {/* <th>PRICE</th> */}
                                     <th>CATEGORY</th>
                                     <th>BRAND</th>
                                     <th></th>
@@ -91,7 +91,6 @@ function ProductListScreen() {
                                         <tr key={product.product_id}>
                                             <td>{product.product_id}</td>
                                             <td>{product.name}</td>
-                                            {/* <td>${product.price}</td> */}
                                             <td>{product.category}</td>
                                             <td>{product.brand}</td>
 

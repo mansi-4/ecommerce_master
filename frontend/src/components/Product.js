@@ -3,14 +3,18 @@ import {Link} from 'react-router-dom'
 import { Card } from 'react-bootstrap'
 import Rating from "./Rating"
 function Product({product}) {
-    console.log(product.image)
+    const minPrice=Math.min(...product.variations.map(variation => variation.price));
+    
   return (
-    <Card className="my-3 p-3 rounded">
+    <Card className="h-100 my-3 p-3 rounded">
         <Link to={`/product/${product.product_id}`}>
-            <Card.Img src={`http://localhost:8003/${product.image}`}></Card.Img>
+            <Card.Img src={`http://localhost:8003/${product.images[0]}`}></Card.Img>
         </Link>
         <Card.Body>
-            <Link to={`/product/${product.product_id}`}>
+            <Card.Title as="div">
+                <h5>{product.brand}</h5>
+            </Card.Title>
+            <Link to={`/product/${product.product_id}`} style={{textDecoration:"none", color:"blue"}}>
                 <Card.Title as="div">
                     <strong>{product.name}</strong>
                 </Card.Title>    
@@ -22,7 +26,8 @@ function Product({product}) {
                 </div>
             </Card.Text>
             <Card.Text as="h3">
-                ${product.price}
+                &#8377;{minPrice}
+                {/* &#8377;{product.variations[0].price} */}
                
             </Card.Text>
         </Card.Body>
