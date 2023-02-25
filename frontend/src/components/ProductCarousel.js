@@ -26,7 +26,7 @@ function ProductCarousel() {
                             <Link to={`/product/${product._id}`}>
                                 <Image src={`http://localhost:8003/${product.images[0]}`} alt={product.name} fluid />
                                 <Carousel.Caption className='carousel.caption'>
-                                    <h4>{product.name} (${product.price})</h4>
+                                    <h4>{product.name} (&#8377;{Math.min(...product.variations.map(variation => variation.price))})</h4>
                                 </Carousel.Caption>
                             </Link>
                         </Carousel.Item>

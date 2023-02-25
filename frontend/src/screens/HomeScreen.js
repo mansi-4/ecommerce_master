@@ -1,5 +1,5 @@
 import React, {useState,useEffect} from 'react'
-import { Row,Col } from 'react-bootstrap'
+import { Row,Col,Form } from 'react-bootstrap'
 import { useDispatch,useSelector } from 'react-redux'
 import products from '../products'
 import Product from "../components/Product"
@@ -9,6 +9,7 @@ import Message from "../components/Message"
 import Paginate from '../components/Paginate'
 import ProductCarousel from '../components/ProductCarousel'
 import {useLocation} from "react-router-dom"
+import { listCategories } from '../actions/categoryActions'
 
 
 function HomeScreen() {
@@ -19,18 +20,42 @@ function HomeScreen() {
     // page,
     // pages
   }= productList
-  let keyword=location.search
+  // let keyword=location.search
+  const [category_id,setCategoryId]=useState("0")
+  const [keyword,setKeyword]=useState("")
   useEffect(()=>{
-   dispatch(listProducts(keyword))
-  },[dispatch,keyword])
+    dispatch(listCategories())
+   dispatch(listProducts(keyword,category_id))
+  },[dispatch,keyword,category_id])
+  const categoryList = useSelector(state => state.categoryList)
+  const { loading:loadingCategories, error:errorCategories, categories } = categoryList
   return (
     <div>
-      {!keyword && <ProductCarousel/>}
+      {keyword==="" && category_id =="0" ? <ProductCarousel/> : ""}
       <h1>Latest Products</h1>
+      <Row className='gy-2'>
+        <Col md={3}>
+          <Form.Control 
+          type='text'
+          placeholder='Type Product Name to Search...'
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          >
+          </Form.Control>
+        </Col>
+        <Col md={3}>
+            <Form.Select  value={category_id} onChange={(e)=>setCategoryId(e.target.value)} >
+              <option value="0">Select categories</option>
+              {categories.map((category,index)=>(
+                  <option value={category.id}>{category.category}</option>
+              ))}
+            </Form.Select>
+        </Col>
+      </Row>
       {loading ? <Loader/>
         :error ? <Message variant="danger">{error}</Message>
           :
-          <div>
+          <div> 
           <Row className='gy-4'>
           {products.map(product=>(
               <Col sm={12} md={6} lg={4} xl={3} key={product.product_id}>

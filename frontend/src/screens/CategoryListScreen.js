@@ -8,7 +8,7 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import { listCategories,deleteCategory,createCategory } from '../actions/categoryActions'
 import {CATEGORY_CREATE_RESET} from "../constants/categoryConstants"
-function CategoryListScreen() {
+function CategoryListScreen() { 
     let history=useNavigate()
     const dispatch = useDispatch()
 

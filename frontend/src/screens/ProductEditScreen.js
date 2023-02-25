@@ -291,6 +291,8 @@ function ProductEditScreen() {
                     {errorVariationDelete && <Message variant='danger'>{errorVariationDelete}</Message>}
                     {loadingVariationCreate && <Loader />}
                     {errorVariationCreate && <Message variant='danger'>{errorVariationCreate}</Message>}
+                    {loadingVariationUpdate && <Loader />}
+                    {errorVariationUpdate && <Message variant='danger'>{errorVariationUpdate}</Message>}
                     <Table striped bordered hover responsive className='table-sm'>
                         <thead>
                             <tr>                                

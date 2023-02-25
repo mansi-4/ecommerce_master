@@ -50,7 +50,7 @@ function UserEditScreen() {
 
     return (
         <div>
-            <Link to='/admin/userlist'>
+            <Link to='/admin/userlist' className='btn btn-light my-3'>
                 Go Back
             </Link>
 

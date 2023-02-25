@@ -79,7 +79,6 @@ function ProductScreen() {
         ))
     }
     function handleColorChange(e){
-        console.log("handle color")
         setColorId(e.target.value)
         const obj={
             "color_id":e.target.value,
@@ -93,6 +92,7 @@ function ProductScreen() {
         setSizeId(e.target.value)
         const obj={
             "size_id":e.target.value,
+            "color_id":color_id,
             "product_id":id
         }
         dispatch(listProductVariationBySize(obj))
@@ -157,56 +157,77 @@ function ProductScreen() {
                                 </ListGroup.Item>
                             </ListGroup>
                         </Col>
-                        {Object.keys(variation).length!==0 && size_id > 0? (
-                            <Col md={3}>
-                            <Card>
-                            <ListGroup variant="flush">
-                                    {variation.price===0 ? (""):(
-                                    <ListGroup.Item>
-                                        <Row>
-                                            <Col>Price:</Col>
-                                            <Col>
-                                                <strong>&#8377; {variation.price}</strong>
-                                            </Col>
-                                        </Row>
-                                    </ListGroup.Item>)}
-                                    
-                                    <ListGroup.Item>
-                                        <Row>
-                                            <Col>Status:</Col>
-                                            <Col>
-                                            {variation.countInStock>0? "In Stock" : "Out of Stock"}
-                                            </Col>
-                                        </Row>
-                                    </ListGroup.Item>
-                                    {/* to make select qty dropdown dynamic */}
-                                    {variation.countInStock > 0 && (
+                        {loadingProductVariationBySize ? <Loader/>
+                            :errorProductVariationBySize ? <Message variant="danger">{errorProductVariationBySize}</Message>
+                            :
+                            Object.keys(variation).length!==0 && size_id > 0? (
+                                <Col md={3}>
+                                <Card>
+                                <ListGroup variant="flush">
+                                        {variation.price===0 ? (""):(
                                         <ListGroup.Item>
                                             <Row>
-                                                <Col>Qty</Col>
-                                                <Col  className='my-1'>
-                                                    <Form.Control as="select" 
-                                                        value={qty} 
-                                                        onChange={(e)=>setQty(e.target.value)}>
-                                                        {
-                                                            [...Array(variation.countInStock).keys()].map((x)=>(
-                                                                <option key={x+1} value={x+1}>
-                                                                    {x+1}
-                                                                </option>
-                                                            ))
-                                                        } 
-                                                    </Form.Control>
+                                                <Col>Price:</Col>
+                                                <Col>
+                                                    <strong>&#8377; {variation.price}</strong>
+                                                </Col>
+                                            </Row>
+                                        </ListGroup.Item>)}
+                                        
+                                        <ListGroup.Item>
+                                            <Row>
+                                                <Col>Status:</Col>
+                                                <Col>
+                                                {variation.countInStock>0? "In Stock" : "Out of Stock"}
                                                 </Col>
                                             </Row>
                                         </ListGroup.Item>
-                                    )}
-                                    <ListGroup.Item className="text-center">
-                                        <Button onClick={addToCartHandler} className='btn btn-block' disabled={variation.countInStock == 0} type='button'>Add to Cart</Button>
-                                    </ListGroup.Item>
-                            </ListGroup>
-                            </Card>
-                            </Col>
-                        ):("")}
+                                        {/* to make select qty dropdown dynamic */}
+                                        {variation.countInStock > 0 && (
+                                            <ListGroup.Item>
+                                                <Row>
+                                                    <Col>Qty</Col>
+                                                    <Col  className='my-1'>
+                                                        {variation.countInStock > 10 ?(
+                                                            <Form.Control as="select" 
+                                                            value={qty} 
+                                                            onChange={(e)=>setQty(e.target.value)}>
+                                                            {
+                                                                [...Array(10).keys()].map((x)=>
+                                                                (
+                                                                    <option key={x+1} value={x+1}>
+                                                                        {x+1}
+                                                                    </option>
+                                                                ))
+                                                            } 
+                                                            </Form.Control>
+                                                            ):(
+                                                            <Form.Control as="select" 
+                                                            value={qty} 
+                                                            onChange={(e)=>setQty(e.target.value)}>
+                                                            {
+                                                                [...Array(variation.countInStock).keys()].map((x)=>
+                                                                (
+                                                                    <option key={x+1} value={x+1}>
+                                                                        {x+1}
+                                                                    </option>
+                                                                ))
+                                                            } 
+                                                            </Form.Control>
+                                                        )}
+                                                        
+                                                    </Col>
+                                                </Row>
+                                            </ListGroup.Item>
+                                        )}
+                                        <ListGroup.Item className="text-center">
+                                            <Button onClick={addToCartHandler} className='btn btn-block' disabled={variation.countInStock == 0} type='button'>Add to Cart</Button>
+                                        </ListGroup.Item>
+                                </ListGroup>
+                                </Card>
+                                </Col>
+                            ):("")
+                        }
                         
                     </Row>
                     <Row>

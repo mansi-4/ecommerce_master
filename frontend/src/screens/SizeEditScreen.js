@@ -55,7 +55,7 @@ function SizeEditScreen() {
     
     return (
         <div>
-            <Link to='/admin/sizelist'>
+            <Link to='/admin/sizelist' className='btn btn-light my-3'>
                 Go Back
             </Link>
 

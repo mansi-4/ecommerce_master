@@ -55,7 +55,7 @@ function ColorEditScreen() {
     
     return (
         <div>
-            <Link to='/admin/colorlist'>
+            <Link to='/admin/colorlist' className='btn btn-light my-3'>
                 Go Back
             </Link>
 

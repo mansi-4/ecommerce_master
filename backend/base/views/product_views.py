@@ -9,15 +9,19 @@ import json
 from base.models import Product,Review,Users,Category,ProductVariations,Color,Size
 from base.helper.ImageWork import handleuploadfile
 # from base.serializers import ProductSerializer
-
+from django_filters.rest_framework import DjangoFilterBackend
 @api_view(["GET"])
 def getProducts(request):
-    
     query=request.query_params.get("keyword")
     if query == None:
         query=''
     
-    products=Product.objects.filter(name__icontains=query,status=0).prefetch_related('review_set').prefetch_related('productvariations_set').select_related('category').select_related('user')
+    category_id=request.query_params.get("category_id")
+    if category_id != "0":
+        products=Product.objects.filter(name__icontains=query,category=category_id,status=0).prefetch_related('review_set').prefetch_related('productvariations_set').select_related('category').select_related('user')
+    else:
+        print("else")
+        products=Product.objects.filter(name__icontains=query,status=0).prefetch_related('review_set').prefetch_related('productvariations_set').select_related('category').select_related('user').all()
     
     serialized_products=[]
     for p in products:
@@ -135,8 +139,9 @@ def getProductVariationSizeByColor(request):
 def getProductVariationBySize(request):
     try:
         size_id=request.GET["size_id"]
+        color_id=request.GET["color_id"]
         product_id=request.GET["product_id"]
-        product_variation=ProductVariations.objects.filter(size=size_id,product=product_id).first()
+        product_variation=ProductVariations.objects.filter(size=size_id,color=color_id,product=product_id).first()
         serialized_product_variation={"product_variation_id":str(product_variation.id),"price":product_variation.price,"countInStock":product_variation.countInStock}
         return Response(serialized_product_variation)
     except:

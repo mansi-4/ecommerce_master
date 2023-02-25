@@ -17,12 +17,14 @@ function Header() {
   <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
     <Container fluid>
         <LinkContainer to="/">
-          <Navbar.Brand>ProShop</Navbar.Brand>
+          {/* <Navbar.Brand>ProShop</Navbar.Brand> */}
+          <Navbar.Brand>Offline2online</Navbar.Brand>
+
         </LinkContainer>
         <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
           
-          <SearchBox/>
+          {/* <SearchBox/> */}
           <Nav
               className="ms-auto"
           >

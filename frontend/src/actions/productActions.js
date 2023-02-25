@@ -67,10 +67,10 @@ import {
     PRODUCT_TOP_FAIL,
 } from '../constants/productConstants'
 
-export const listProducts = (keyword='') => async (dispatch) => {
+export const listProducts = (keyword,category_id) => async (dispatch) => {
     try{
         dispatch({type:PRODUCT_LIST_REQUEST})
-        const {data} = await axios.get(`http://localhost:8003/api/products/${keyword}`)
+        const {data} = await axios.get(`http://localhost:8003/api/products/?keyword=${keyword===undefined?"":keyword}&category_id=${category_id===undefined?"0":category_id}`)
         dispatch({
             type:PRODUCT_LIST_SUCCESS,
             payload:data
@@ -170,6 +170,7 @@ export const listProductVariationBySize = (obj) =>async (dispatch) => {
         dispatch({type:PRODUCT_VARIATION_BY_SIZE_REQUEST})
         const {data} = await axios.get(`http://localhost:8003/api/products/variation_by_size/`,{params: {
             size_id: obj.size_id,
+            color_id:obj.color_id,
             product_id: obj.product_id 
           }})
         dispatch({

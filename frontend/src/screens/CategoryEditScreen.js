@@ -55,7 +55,7 @@ function CategoryEditScreen() {
     
     return (
         <div>
-            <Link to='/admin/categorylist'>
+            <Link to='/admin/categorylist' className='btn btn-light my-3'>
                 Go Back
             </Link>
 
