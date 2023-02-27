@@ -49,35 +49,57 @@ function CartScreen() {
         ):(
             <ListGroup variant="flush">
                 {cartItems.map((item)=>(
-                    <ListGroup.Item key={item.product}>
+                    <ListGroup.Item key={item.product_variation_id}>
                         <Row>
                             <Col md={2}>
                                 <Image src={`http://localhost:8003/${item.image}`} alt={item.name} fluid rounded/>
                             </Col>
                             <Col md={3}>
-                                <Link to={`/product/${item.product}`}>{item.name}</Link>
+                                <Link to={`/product/${item.product_id}`}>{item.name}</Link>
+                            </Col>
+                            <Col md={1}>
+                            {item.color}
+                            </Col>
+                            <Col md={1}>
+                            {item.size}
+                            </Col>
+                            <Col md={1}>
+                            &#8377;{item.price}
                             </Col>
                             <Col md={2}>
-                                ${item.price}
-                            </Col>
-                            <Col md={3}>
-                                    <Form.Control as="select" 
-                                        value={item.qty} 
-                                        onChange={(e)=>dispatch(addToCart(item.product,Number(e.target.value)))}>
-                                        {
-                                            [...Array(item.countInStock).keys()].map((x)=>(
-                                                <option key={x+1} value={x+1}>
-                                                    {x+1}
-                                                </option>
-                                            ))
-                                        } 
-                                    </Form.Control>
+                            
+                            {item.countInStock > 10 ?(
+                                <Form.Control as="select" 
+                                    value={item.qty} 
+                                    onChange={(e)=>dispatch(addToCart(item.product_variation_id,Number(e.target.value)))}>
+                                    {
+                                        [...Array(10).keys()].map((x)=>(
+                                            <option key={x+1} value={x+1}>
+                                                {x+1}
+                                            </option>
+                                        ))
+                                    } 
+                                </Form.Control>
+                            ):( 
+                                <Form.Control as="select" 
+                                    value={item.qty} 
+                                    onChange={(e)=>dispatch(addToCart(item.product_variation_id,Number(e.target.value)))}>
+                                    {
+                                        [...Array(item.countInStock).keys()].map((x)=>(
+                                            <option key={x+1} value={x+1}>
+                                                {x+1}
+                                            </option>
+                                        ))
+                                    } 
+                                </Form.Control>
+                            )
+                        }
                             </Col>
                             <Col md={1}>
                                 <Button
                                 type="button"
                                 variant="light"
-                                onClick={()=>removeFromCartHandler(item.product)}
+                                onClick={()=>removeFromCartHandler(item.product_id)}
                                 >
                                     <i className='fas fa-trash'></i>
                                 </Button>
@@ -93,7 +115,7 @@ function CartScreen() {
             <ListGroup variant="flush">
                 <ListGroup.Item>
                     <h2>SubTotal ({cartItems.reduce((acc,item) => acc+item.qty,0)}) items</h2>
-                    ${cartItems.reduce((acc,item) => acc+item.qty*item.price,0).toFixed(2)}
+                    &#8377;{cartItems.reduce((acc,item) => acc+item.qty*item.price,0).toFixed(2)}
                 </ListGroup.Item>
             </ListGroup>
             <ListGroup.Item className="text-center">

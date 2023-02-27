@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
+import { Button, Row, Col, ListGroup, Image, Card,Form } from 'react-bootstrap'
 import { Link ,useNavigate,useParams} from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Message from '../components/Message'
@@ -25,24 +25,30 @@ function OrderScreen() {
     if(!loading && !error){
         order.itemsPrice = order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0).toFixed(2)
     }
-   
+    const [shipping_status,setShippingStatus]=useState("")
     useEffect(() => {
         if(!userInfo){
             history("/login")
         }
         else{
             if(!order || order._id!==Number(id) || successDeliver || successPay){
-                console.log(order)
                 dispatch({ type: ORDER_PAY_RESET }) 
                 dispatch({ type: ORDER_DELIVER_RESET })
                 dispatch(getOrderDetails(id))
+            }
+            else{
+                setShippingStatus(order.shipping_status)
             }
         }
         
     }, [order,id,successDeliver,successPay])
     
-    const deliverHandler = () => {
-        dispatch(deliverOrder(id))
+    const deliverHandler = (e) => {
+        setShippingStatus(e.target.value)
+        const obj={
+            "shipping_status":e.target.value
+        }
+        dispatch(deliverOrder(id,obj))
     }
     const payHandler = () => {
         dispatch(payOrder(id))
@@ -73,8 +79,10 @@ function OrderScreen() {
                                 </p>
                                 {order.isDelivered ? (
                                         <Message variant='success'>Delivered on {order.deliveredAt}</Message>
-                                    ) : (
-                                            <Message variant='warning'>Not Delivered</Message>
+                                    ) : order.shipping_status === "Not Delivered" ?(
+                                            <Message variant='danger'>{order.shipping_status}</Message>
+                                        ): (
+                                            <Message variant='info'>{order.shipping_status}</Message>
                                         )}
                             </ListGroup.Item>
 
@@ -105,11 +113,19 @@ function OrderScreen() {
                                                         </Col>
 
                                                         <Col>
-                                                            <Link to={`/product/${item.product}`}>{item.name}</Link>
+                                                            <Link to={`/product/${item.product_id}`}>{item.name}</Link>
+                                                        </Col>
+
+                                                        <Col>
+                                                            {item.color}
+                                                        </Col>
+
+                                                        <Col>
+                                                            {item.size}
                                                         </Col>
 
                                                         <Col md={4}>
-                                                            {item.qty} X ${item.price} = ${(item.qty * item.price).toFixed(2)}
+                                                            {item.qty} X &#8377;{item.price} = &#8377;{(item.qty * item.price).toFixed(2)}
                                                         </Col>
                                                     </Row>
                                                 </ListGroup.Item>
@@ -131,28 +147,28 @@ function OrderScreen() {
                                     <ListGroup.Item>
                                         <Row>
                                             <Col>Items:</Col>
-                                            <Col>${order.itemsPrice}</Col>
+                                            <Col>&#8377;{order.itemsPrice}</Col>
                                         </Row>
                                     </ListGroup.Item>
 
                                     <ListGroup.Item>
                                         <Row>
                                             <Col>Shipping:</Col>
-                                            <Col>${order.shippingPrice}</Col>
+                                            <Col>&#8377;{order.shippingPrice}</Col>
                                         </Row>
                                     </ListGroup.Item>
 
                                     <ListGroup.Item>
                                         <Row>
                                             <Col>Tax:</Col>
-                                            <Col>${order.taxPrice}</Col>
+                                            <Col>&#8377;{order.taxPrice}</Col>
                                         </Row>
                                     </ListGroup.Item>
 
                                     <ListGroup.Item>
                                         <Row>
                                             <Col>Total:</Col>
-                                            <Col>${order.totalPrice}</Col>
+                                            <Col>&#8377;{order.totalPrice}</Col>
                                         </Row>
                                     </ListGroup.Item>
 
@@ -186,6 +202,35 @@ function OrderScreen() {
                                     </ListGroup.Item>
                                 )}
                             </Card>
+                            <br></br>
+                            {userInfo && userInfo.isAdmin && !order.isDelivered && (<Card>
+                                <ListGroup variant='flush'>
+                                    <ListGroup.Item>
+                                        <h2>Shipping Status</h2>
+                                    </ListGroup.Item>
+
+                                    <ListGroup.Item className='m-3'>
+                                    <Form.Group>
+                                       
+                                        <Form.Select name="shipping_status" value={shipping_status} onChange={(e)=>deliverHandler(e)}>
+                                            <option selected disabled>Select Shipping Status</option>
+                                            <option value="In-Progress">In-Progress</option>
+                                            <option value="Shipped">Shipped</option>
+                                            <option value="Out for Delivery">Out for Delivery</option>
+                                            <option value="Not Delivered">Not Delivered</option>
+                                            <option value="Delivered">Delivered</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                        
+                                    </ListGroup.Item>
+
+                                    
+
+                                </ListGroup>
+                                
+                                
+                            </Card>)}
+                            
                     </Col>
             </Row>
             </div>

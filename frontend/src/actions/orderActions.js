@@ -155,8 +155,9 @@ export const payOrder = (id) => async (dispatch, getState) => {
 }
 
 
-export const deliverOrder = (id) => async (dispatch, getState) => {
+export const deliverOrder = (id,obj) => async (dispatch, getState) => {
     try {
+        console.log(obj.shipping_status)
         dispatch({
             type: ORDER_DELIVER_REQUEST
         })
@@ -173,10 +174,9 @@ export const deliverOrder = (id) => async (dispatch, getState) => {
 
         const { data } = await axios.put(
             `http://localhost:8003/api/orders/${id}/deliver/`,
-            {},
+            {"shipping_status":obj.shipping_status},
             config
         )
-
         dispatch({
             type: ORDER_DELIVER_SUCCESS,
             payload: data

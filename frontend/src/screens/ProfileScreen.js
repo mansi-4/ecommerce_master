@@ -60,7 +60,6 @@ function ProfileScreen() {
             setMessage("Passwords do not match")
         }
         else{
-            console.log(user)
             dispatch(updateUserProfile({
                 "id":user.id,
                 "name":name,
@@ -173,9 +172,11 @@ function ProfileScreen() {
                                         ))}
                                 </tbody>
                                 ):(
+                                    <tbody>
                                     <Message variant='info'>
                                         Order is empty
                                     </Message>
+                                    </tbody>
                                     )}
                             </Table>
                         )}

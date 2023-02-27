@@ -111,6 +111,7 @@ class Order(models.Model):
     isPaid = models.BooleanField(default=False)
     paidAt = models.DateTimeField(auto_now_add=False, null=True, blank=True)
     isDelivered = models.BooleanField(default=False)
+    shippingStatus=models.CharField(max_length=200,null=True,blank=True)
     deliveredAt = models.DateTimeField(
         auto_now_add=False, null=True, blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
@@ -124,9 +125,11 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    product_variation = models.ForeignKey(ProductVariations, on_delete=models.CASCADE, null=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=200, null=True, blank=True)
+    color = models.CharField(max_length=200, null=True, blank=True)
+    size = models.CharField(max_length=200, null=True, blank=True)
     qty = models.IntegerField(null=True, blank=True, default=0)
     price = models.DecimalField(
         max_digits=7, decimal_places=2, null=True, blank=True)

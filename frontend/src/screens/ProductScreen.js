@@ -66,7 +66,7 @@ function ProductScreen() {
     let history=useNavigate();
 
     function addToCartHandler() {
-        history(`/cart/${id}?qty=${qty}`)
+        history(`/cart/${variation.product_variation_id}?qty=${qty}`)
     }
 
     const submitHandler = (e) => {

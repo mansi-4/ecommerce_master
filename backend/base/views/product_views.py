@@ -67,7 +67,7 @@ def getTopProducts(request):
         for pp in product_variations:
             pv={"product_variation_id":pp.id,"color_id":pp.color.id,"color":pp.color.color,"size_id":pp.size.id,"size":pp.size.size,"price":pp.price,"countInStock":pp.countInStock}
             serialized_product_variations.append(pv)
-        st={"product_id":"","name":p.name,"brand":p.brand,"category_id":p.category.id,"category":p.category.category,"description":p.description,"rating":p.rating,"num_reviews":p.numReviews,"createdAt":p.createdAt,"user_id":p.user.id,"user_name":p.user.name,"images":serialized_images,"variations":serialized_product_variations,"reviews":serialized_reviews}
+        st={"product_id":p._id,"name":p.name,"brand":p.brand,"category_id":p.category.id,"category":p.category.category,"description":p.description,"rating":p.rating,"num_reviews":p.numReviews,"createdAt":p.createdAt,"user_id":p.user.id,"user_name":p.user.name,"images":serialized_images,"variations":serialized_product_variations,"reviews":serialized_reviews}
         serialized_products.append(st)
     return Response(serialized_products)
 
@@ -406,30 +406,36 @@ def getProductVariations(request,pk):
 
 @api_view(["GET"])
 def getProductVariation(request,pk):
-    if 'Authorization' in request.headers:
-        token=request.headers['Authorization']
-        if not token:
-            raise AuthenticationFailed('Unauthenticated!')
-        try:
-            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed('Token has Expired!')
-        except jwt.InvalidSignatureError:
-            raise AuthenticationFailed("Invalid Token")
-        except:
-            raise AuthenticationFailed("Something went wrong")
-        user = Users.objects.filter(id=payload['id']).first()
-        if(user.is_superuser):
-            try:
-                product_variation=ProductVariations.objects.select_related("color").select_related("size").get(id=pk)
-                st={"product_variation_id":product_variation.id,"color_id":product_variation.color.id,"color":product_variation.color.color,"size_id":product_variation.size.id,"size":product_variation.size.size,"price":product_variation.price,"countInStock":product_variation.countInStock}
+    # if 'Authorization' in request.headers:
+    #     token=request.headers['Authorization']
+    #     if not token:
+    #         raise AuthenticationFailed('Unauthenticated!')
+    #     try:
+    #         payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+    #     except jwt.ExpiredSignatureError:
+    #         raise AuthenticationFailed('Token has Expired!')
+    #     except jwt.InvalidSignatureError:
+    #         raise AuthenticationFailed("Invalid Token")
+    #     except:
+    #         raise AuthenticationFailed("Something went wrong")
+    #     user = Users.objects.filter(id=payload['id']).first()
+    #     if(user.is_superuser):
+            # try:
+                product_variation=ProductVariations.objects.select_related("color").select_related("size").select_related("product").get(id=pk)
+                product_images=product_variation.product.image
+                serialized_images=[]
+                if product_images!=None:
+                    split_images_list=product_images.split(",")
+                    for s in split_images_list:
+                        serialized_images.append("static/multimedia/"+str(s))
+                st={"product_variation_id":product_variation.id,"color_id":product_variation.color.id,"color":product_variation.color.color,"size_id":product_variation.size.id,"size":product_variation.size.size,"price":product_variation.price,"countInStock":product_variation.countInStock,"product_id":product_variation.product._id,"name":product_variation.product.name,"image":serialized_images[0]}
                 return Response(st) 
-            except:
-                return Response("No Data Found")
-        else:
-            return Response("You're not an admin")
-    else:
-        return Response("Authorization Token not provided")
+            # except:
+            #     return Response("No Data Found")
+    #     else:
+    #         return Response("You're not an admin")
+    # else:
+    #     return Response("Authorization Token not provided")
 
 @api_view(['POST'])
 def createProductVariation(request,pk):
