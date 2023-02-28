@@ -14,7 +14,7 @@ function PaymentScreen() {
 
     const dispatch = useDispatch()
 
-    const [paymentMethod, setPaymentMethod] = useState('Cash On Delivery')
+    const [paymentMethod, setPaymentMethod] = useState()
 
     if (!shippingAddress.address) {
         history('/shipping')
@@ -32,20 +32,35 @@ function PaymentScreen() {
 
             <Form onSubmit={submitHandler}>
                 <Form.Group>
-                    <Form.Label as='legend'>Select Method</Form.Label>
+                    <Form.Label as='legend'>Select Payment Method</Form.Label>
                     <Col>
                         <Form.Check
                             type='radio'
                             label='Cash On Delivery'
                             id='cod'
                             name='paymentMethod'
-                            checked
+                            value="Cash On Delivery"
+                            // checked
                             onChange={(e) => setPaymentMethod(e.target.value)}
                         >
+                        </Form.Check>
+                    </Col>
+                    <Col>
+                        <Form.Check
+                            type='radio'
+                            label='RazorPay'
+                            id='rpay'
+                            name='paymentMethod'
+                            value="RazorPay"
 
+                            // checked
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                        >
                         </Form.Check>
                     </Col>
                 </Form.Group>
+
+                
 
                 <Button type='submit' className="m-3" variant='primary'>
                     Continue

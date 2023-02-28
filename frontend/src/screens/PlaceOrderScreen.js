@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect,useForm } from 'react'
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
 import { Link ,useNavigate} from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -6,10 +6,17 @@ import Message from '../components/Message'
 import CheckoutSteps from '../components/CheckoutSteps'
 import {createOrder} from '../actions/orderActions'
 import {ORDER_CREATE_RESET} from '../constants/orderConstants'
+
+import axios from 'axios'
+
+
 function PlaceOrderScreen() {
     let history=useNavigate()
     const orderCreate = useSelector(state => state.orderCreate)
     const { order, error, success } = orderCreate
+    const userLogin=useSelector(state => state.userLogin)
+    // destructuring the response what we get from reducer 
+    const {error:erroruserlogin,loading,userInfo} = userLogin
 
     const dispatch=useDispatch()
     // fetched the cart details
@@ -34,17 +41,54 @@ function PlaceOrderScreen() {
     }, [success, history])
 
     const placeOrder = () =>{
-       
-        dispatch(createOrder({
-            orderItems: cart.cartItems,
-            shippingAddress: cart.shippingAddress,
-            paymentMethod: cart.paymentMethod,
-            itemsPrice: cart.itemsPrice,
-            shippingPrice: cart.shippingPrice,
-            taxPrice: cart.taxPrice,
-            totalPrice: cart.totalPrice,
-        }))
-    }
+
+        switch (cart.paymentMethod) {
+            case 'Cash On Delivery':
+                dispatch(createOrder({
+                    orderItems: cart.cartItems,
+                    shippingAddress: cart.shippingAddress,
+                    paymentMethod: cart.paymentMethod,
+                    itemsPrice: cart.itemsPrice,
+                    shippingPrice: cart.shippingPrice,
+                    taxPrice: cart.taxPrice,
+                    totalPrice: cart.totalPrice,
+                }))
+
+                break;
+            case 'RazorPay':
+                        var options = {
+                            "key": "YOUR_KEY_ID", // Enter the Key ID generated from the Dashboard
+                            "amount": cart.totalPrice, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                            "currency": "INR",
+                            "name": "OFFLINE 2 ONLINE", //your business name
+                            "description": "ECOMMERCE",
+                            "image": "https://example.com/your_logo",
+                            "handler": function (response){
+                                alert(response.razorpay_payment_id);
+                               
+                            },
+                            "prefill": {
+                                "name": userInfo.name, //your customer's name
+                                "email": userInfo.email,
+                            },
+                            "theme": {
+                                "color": "#3399cc"
+                            }
+                        };
+                        var rzp = new window.Razorpay(options);
+                        rzp.on('payment.failed', function (response){
+                            alert(response.error.code + "payment failed try again");
+                        });
+                        // rzp.open();
+                        break;
+                }
+            }
+                
+            
+
+    
+
+
   return (
     <div>
       <CheckoutSteps step1 step2 step3 step4 />
@@ -82,7 +126,7 @@ function PlaceOrderScreen() {
                                         <ListGroup.Item key={index}>
                                             <Row>
                                                 <Col md={1}>
-                                                    <Image src={item.image} alt={item.name} fluid rounded />
+                                                    <Image src= {`http://localhost:8003/${item.image}`} alt={item.name} fluid rounded />
                                                 </Col>
 
                                                 <Col >
