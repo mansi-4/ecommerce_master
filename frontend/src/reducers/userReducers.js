@@ -8,6 +8,15 @@ import {
     USER_REGISTER_FAIL,
     USER_REGISTER_SUCCESS,
 
+    USER_ACTIVATION_REQUEST,
+    USER_ACTIVATION_FAIL,
+    USER_ACTIVATION_SUCCESS,
+
+
+    USER_VERIFY_REQUEST,
+    USER_VERIFY_FAIL,
+    USER_VERIFY_SUCCESS,
+
     USER_DETAILS_REQUEST,
     USER_DETAILS_FAIL,
     USER_DETAILS_SUCCESS,
@@ -17,6 +26,11 @@ import {
     USER_UPDATE_PROFILE_SUCCESS,
     USER_UPDATE_PROFILE_FAIL,
     USER_UPDATE_PROFILE_RESET,
+
+    USER_UPDATE_PASSWORD_REQUEST,
+    USER_UPDATE_PASSWORD_SUCCESS,
+    USER_UPDATE_PASSWORD_FAIL,
+    USER_UPDATE_PASSWORD_RESET,
 
     USER_LIST_REQUEST,
     USER_LIST_FAIL,
@@ -66,7 +80,7 @@ export const userRegisterReducer= (state={},action)=>{
         case USER_REGISTER_SUCCESS:
             return {
                 loading:false,
-                userInfo:action.payload
+                success:action.payload
             }
         case USER_REGISTER_FAIL:
             return {
@@ -80,6 +94,48 @@ export const userRegisterReducer= (state={},action)=>{
     }
 }
 
+export const userActivationReducer= (state={},action)=>{
+    switch(action.type){
+        case USER_ACTIVATION_REQUEST:
+            return {
+                loading:true,
+            }
+        case USER_ACTIVATION_SUCCESS:
+            return {
+                loading:false,
+                activation:action.payload
+            }
+        case USER_ACTIVATION_FAIL:
+            return {
+                loading:false,
+                error:action.payload
+            } 
+        
+        default:
+            return state
+    }
+}
+
+export const userVerifyReducer= (state={},action)=>{
+    switch(action.type){
+        case USER_VERIFY_REQUEST:
+            return {
+                loading:true,
+            }
+        case USER_VERIFY_SUCCESS:
+            return {
+                loading:false,
+                verify:action.payload
+            }
+        case USER_VERIFY_FAIL:
+            return {
+                loading:false,
+                error:action.payload
+            } 
+        default:
+            return state
+    }
+}
 
 export const userDetailsReducer= (state={user:{}},action)=>{
     switch(action.type){
@@ -119,6 +175,25 @@ export const userUpdateProfileReducer = (state = {}, action) => {
             return { loading: false, error: action.payload }
 
         case USER_UPDATE_PROFILE_RESET:
+            return {}
+
+        default:
+            return state
+    }
+}
+
+export const userUpdatePasswordReducer = (state = {}, action) => {
+    switch (action.type) {
+        case USER_UPDATE_PASSWORD_REQUEST:
+            return { loading: true }
+
+        case USER_UPDATE_PASSWORD_SUCCESS:
+            return { loading: false, success: true  }
+
+        case USER_UPDATE_PASSWORD_FAIL:
+            return { loading: false, error: action.payload }
+
+        case USER_UPDATE_PASSWORD_RESET:
             return {}
 
         default:

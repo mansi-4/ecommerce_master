@@ -13,8 +13,9 @@ import { listSizes } from '../actions/sizeActions'
 import axios from 'axios'
 import {CATEGORY_CREATE_RESET} from "../constants/categoryConstants"
 import { PRODUCT_CREATE_RESET } from '../constants/productConstants'
-
 import { createProduct } from '../actions/productActions'
+import {logout} from '../actions/userAction'
+import jwt_decode from "jwt-decode";
 function ProductCreateScreen() {
     let history=useNavigate()
     const dispatch = useDispatch()
@@ -35,34 +36,44 @@ function ProductCreateScreen() {
     const { product: createdProduct, loading: loadingCreate,error:errorCreate, success: successCreate } = productCreate
     
     useEffect(() => {
-        if (!userInfo.isAdmin) {
+        if (userInfo && userInfo.isAdmin) {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }
+            else{
+                if(successCreate){
+                    dispatch({ type: PRODUCT_CREATE_RESET })
+                    history('/admin/productlist')
+                    
+                    setVariationsListArr([])
+                    setProductVariations({
+                        color_id:"",
+                        size_id:"",
+                        stock:"",
+                        price:""
+                    })
+                    setProduct({
+                        name:"",
+                        brand:"",
+                        category_id:"",
+                        description:""                
+                    })
+                    setImages([])
+        
+                    
+                }else{
+                    dispatch(listCategories())
+                    dispatch(listColors())
+                    dispatch(listSizes())
+                }
+            }
+        }
+        else{
             history('/login')
         }
-        if(successCreate){
-            dispatch({ type: PRODUCT_CREATE_RESET })
-            history('/admin/productlist')
-            
-            setVariationsListArr([])
-            setProductVariations({
-                color_id:"",
-                size_id:"",
-                stock:"",
-                price:""
-            })
-            setProduct({
-                name:"",
-                brand:"",
-                category_id:"",
-                description:""                
-            })
-            setImages([])
-
-            
-        }else{
-            dispatch(listCategories())
-            dispatch(listColors())
-            dispatch(listSizes())
-        }
+        
     }, [dispatch, history, userInfo,successCreate])
 
     const [images, setImages] = useState([])
@@ -122,18 +133,26 @@ function ProductCreateScreen() {
 
       const submitHandler = (e) => {
         e.preventDefault()
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('brand', brand);
-        for (let i = 0 ; i < images.length ; i++) {
-            formData.append("images", images[i]);
+        if(images.length > 5){
+            alert("you can upload images max upto 5...");
+        }else if(variationsListArr.length < 0){
+            alert("Please add at least one product variation");
+
         }
-        formData.append('category_id', category_id);
-        formData.append('description', description);
-        formData.append('productVariations', JSON.stringify(variationsListArr));
-        dispatch(createProduct(
-            formData
-        ))
+        else{
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('brand', brand);
+            for (let i = 0 ; i < images.length ; i++) {
+                formData.append("images", images[i]);
+            }
+            formData.append('category_id', category_id);
+            formData.append('description', description);
+            formData.append('productVariations', JSON.stringify(variationsListArr));
+            // dispatch(createProduct(
+            //     formData
+            // ))
+        }
     }
     return (
         <div>
@@ -149,7 +168,7 @@ function ProductCreateScreen() {
                     <Form.Group controlId='name'>
                         <Form.Label>Name</Form.Label>
                         <Form.Control
-
+                            required
                             type='name'
                             placeholder='Enter name'
                             name="name"
@@ -161,13 +180,14 @@ function ProductCreateScreen() {
 
 
                     <Form.Group controlId='image'>
-                        <Form.Label>Image</Form.Label>
+                        <Form.Label>Images</Form.Label>
                         <Form.Control
                                 type="file"
                                 id='image-file'
                                 label='Choose File'
                                 onChange={(e)=>setImages(e.target.files)}
                                 multiple
+                                required
                             ></Form.Control>
                     </Form.Group>
 
@@ -181,13 +201,14 @@ function ProductCreateScreen() {
                             name="brand"
                             value={brand}
                             onChange={handleChange}
+                            required
                         >
                         </Form.Control>
                     </Form.Group>
 
                     <Form.Group controlId='category'>
                         <Form.Label>Category</Form.Label>
-                        <Form.Select name="category_id" value={category_id} onChange={handleChange}>
+                        <Form.Select name="category_id" value={category_id} onChange={handleChange} required>
                             <option>Select categories</option>
                             {categories.map((category,index)=>(
                                 <option value={category.id}>{category.category}</option>
@@ -198,12 +219,13 @@ function ProductCreateScreen() {
                     <Form.Group controlId='description'>
                         <Form.Label>Description</Form.Label>
                         <Form.Control
-
-                            type='text'
+                            as="textarea"
+                            // type='text'
                             placeholder='Enter description'
                             name="description"
                             value={description}
                             onChange={handleChange}
+                            required
                         >
                         </Form.Control>
                     </Form.Group>

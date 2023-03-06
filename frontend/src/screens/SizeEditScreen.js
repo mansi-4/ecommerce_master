@@ -8,6 +8,8 @@ import Message from '../components/Message'
 import FormContainer from '../components/FormContainer'
 import { listSizeDetails, updateSize } from '../actions/sizeActions'
 import { SIZE_UPDATE_RESET } from '../constants/sizeConstants'
+import {logout} from '../actions/userAction'
+import jwt_decode from "jwt-decode";
 
 function SizeEditScreen() {
     let history=useNavigate()
@@ -30,19 +32,30 @@ function SizeEditScreen() {
     const { userInfo } = userLogin
 
     useEffect(() => {
-       if (successUpdate) {
-            dispatch({ type: SIZE_UPDATE_RESET })
-            history('/admin/sizelist')
-        } else {
-            if (!size.size || size.id !== Number(id)) {
-                dispatch(listSizeDetails(id))
-            } else {
-                setSize(size.size)
-                
-
+        if (userInfo && userInfo.isAdmin) {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }
+            else{
+                if (successUpdate) {
+                    dispatch({ type: SIZE_UPDATE_RESET })
+                    history('/admin/sizelist')
+                } else {
+                    if (!size.size || size.id !== Number(id)) {
+                        dispatch(listSizeDetails(id))
+                    } else {
+                        setSize(size.size)
+                    }
+                } 
             }
         }
-    }, [dispatch,size, id, history,successUpdate])
+        else{
+            history('/login')
+        }
+       
+    }, [dispatch,size, id, history,successUpdate,userInfo])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -75,6 +88,7 @@ function SizeEditScreen() {
                                 placeholder='Enter name'
                                 value={size_name}
                                 onChange={(e) => setSize(e.target.value)}
+                                required
                             >
                             </Form.Control>
                         </Form.Group>

@@ -9,6 +9,8 @@ import {USER_UPDATE_PROFILE_RESET} from '../constants/userConstants'
 
 import {getUserDetails,updateUserProfile} from '../actions/userAction'
 import { listMyOrders } from '../actions/orderActions'
+import {logout} from "../actions/userAction"
+import jwt_decode from "jwt-decode";
 
 function ProfileScreen() {
     let history = useNavigate()
@@ -35,21 +37,26 @@ function ProfileScreen() {
     const { loading: loadingOrders, error: errorOrders, orders } = orderListMy
 
     useEffect(()=>{
-        // if user is not logged in redirect him to login
-        if(!userInfo){
-            history("/login")
-        }else{
-            // if he is logged in then check his details are loaded or not if not call getuserdetails else store the details in state
-            if(!user || !user.name || success || userInfo._id !== user.user_id){
-                dispatch({type:USER_UPDATE_PROFILE_RESET})
-                dispatch(getUserDetails("profile"))
-                dispatch(listMyOrders())
+        if (userInfo) {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
             }
             else{
-                setName(user.name)
-                setEmail(user.email)
-
+                if(!user || !user.name || success || userInfo._id !== user.user_id){
+                    dispatch({type:USER_UPDATE_PROFILE_RESET})
+                    dispatch(getUserDetails("profile"))
+                    dispatch(listMyOrders())
+                }
+                else{
+                    setName(user.name)
+                    setEmail(user.email)
+                }
             }
+        }
+        else{
+            history("/login")
         }
     },[dispatch,history,userInfo,user,success])
 
@@ -150,7 +157,7 @@ function ProfileScreen() {
                                         <th>Paid</th>
                                         <th>Delivered</th>
                                         <th></th>
-                                    </tr>
+                                    </tr> 
                                 </thead>
                                 {orders.length > 0 ?(
                                     
@@ -159,7 +166,7 @@ function ProfileScreen() {
                                             <tr key={order._id}>
                                                 <td>{order._id}</td>
                                                 <td>{order.createdAt.substring(0, 10)}</td>
-                                                <td>${order.totalPrice}</td>
+                                                <td>&#8377;{order.totalPrice}</td>
                                                 <td>{order.isPaid ? order.paidAt.substring(0, 10) : (
                                                     <i className='fas fa-times' style={{ color: 'red' }}></i>
                                                 )}</td>

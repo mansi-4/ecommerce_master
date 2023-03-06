@@ -6,16 +6,30 @@ import { useDispatch, useSelector } from 'react-redux'
 import FormContainer from '../components/FormContainer'
 import CheckoutSteps from '../components/CheckoutSteps'
 import {savePaymentMethod} from '../actions/cartActions'
+import {logout} from "../actions/userAction"
+import jwt_decode from "jwt-decode";
 
 function PaymentScreen() {
     let history = useNavigate()
     const cart = useSelector(state => state.cart)
     const { shippingAddress } = cart
-
+    const userLogin = useSelector(state => state.userLogin)
+    const { userInfo } = userLogin
     const dispatch = useDispatch()
 
     const [paymentMethod, setPaymentMethod] = useState()
-
+    
+    useEffect(() => {
+        if(userInfo){
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }
+        }else{
+            history('/login')
+        }
+    },[userInfo])
+    
     if (!shippingAddress.address) {
         history('/shipping')
     }

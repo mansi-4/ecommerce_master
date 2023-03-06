@@ -8,6 +8,8 @@ import Message from '../components/Message'
 import FormContainer from '../components/FormContainer'
 import { listCategoryDetails, updateCategory } from '../actions/categoryActions'
 import { CATEGORY_UPDATE_RESET } from '../constants/categoryConstants'
+import {logout} from '../actions/userAction'
+import jwt_decode from "jwt-decode";
 
 function CategoryEditScreen() {
     let history=useNavigate()
@@ -30,19 +32,30 @@ function CategoryEditScreen() {
     const { userInfo } = userLogin
 
     useEffect(() => {
-       if (successUpdate) {
-            dispatch({ type: CATEGORY_UPDATE_RESET })
-            history('/admin/categorylist')
-        } else {
-            if (!category.category || category.id !== Number(id)) {
-                dispatch(listCategoryDetails(id))
-            } else {
-                setCategory(category.category)
-                
-
+        if (userInfo && userInfo.isAdmin) {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }
+            else{
+                if (successUpdate) {
+                    dispatch({ type: CATEGORY_UPDATE_RESET })
+                    history('/admin/categorylist')
+                } else {
+                    if (!category.category || category.id !== Number(id)) {
+                        dispatch(listCategoryDetails(id))
+                    } else {
+                        setCategory(category.category)
+                    }
+                }
             }
         }
-    }, [dispatch,category, id, history,successUpdate])
+        else{
+            history('/login')
+        }
+       
+    }, [dispatch,category, id, history,successUpdate,userInfo])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -75,6 +88,7 @@ function CategoryEditScreen() {
                                 placeholder='Enter name'
                                 value={category_name}
                                 onChange={(e) => setCategory(e.target.value)}
+                                required
                             >
                             </Form.Control>
                         </Form.Group>

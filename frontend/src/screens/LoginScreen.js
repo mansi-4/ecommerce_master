@@ -47,6 +47,7 @@ function LoginScreen() {
             placeholder="Enter email"
             value={email}
             onChange={(e)=>setEmail(e.target.value)}
+            required
             ></Form.Control>
         </Form.Group>
         <Form.Group controlId="password">
@@ -56,14 +57,22 @@ function LoginScreen() {
             placeholder="Enter password"
             value={password}
             onChange={(e)=>setPassword(e.target.value)}
+            required
             ></Form.Control>
         </Form.Group>
+        <Row className="float-end">
+        <Col>
+            {/* <Link to={redirect ? `/verify?redirect=${redirect}` : '/verify'}>Forgot Password ?</Link> */}
+            <Link to='/verify'>Forgot Password ?</Link>
 
+        </Col>
+      </Row>
         <Button type="submit" className="m-2" variant="primary">Sign In</Button>
       </Form>
+      
       <Row className="py-3">
         <Col>
-            New Customer ? <Link to={redirect ? `/register?redirect=${redirect}` : '/register'}>Register</Link>
+            New Customer ? <Link to={ '/register'}>Register</Link>
         </Col>
       </Row>
     </FormContainer>

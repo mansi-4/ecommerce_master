@@ -8,6 +8,8 @@ import Message from '../components/Message'
 import FormContainer from '../components/FormContainer'
 import { listColorDetails, updateColor } from '../actions/colorActions'
 import { COLOR_UPDATE_RESET } from '../constants/colorConstants'
+import {logout} from '../actions/userAction'
+import jwt_decode from "jwt-decode";
 
 function ColorEditScreen() {
     let history=useNavigate()
@@ -30,19 +32,32 @@ function ColorEditScreen() {
     const { userInfo } = userLogin
 
     useEffect(() => {
-       if (successUpdate) {
-            dispatch({ type: COLOR_UPDATE_RESET })
-            history('/admin/colorlist')
-        } else {
-            if (!color.color || color.id !== Number(id)) {
-                dispatch(listColorDetails(id))
-            } else {
-                setColor(color.color)
-                
-
+        if (userInfo && userInfo.isAdmin) {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }
+            else{
+                if (successUpdate) {
+                    dispatch({ type: COLOR_UPDATE_RESET })
+                    history('/admin/colorlist')
+                } else {
+                    if (!color.color || color.id !== Number(id)) {
+                        dispatch(listColorDetails(id))
+                    } else {
+                        setColor(color.color)
+                        
+        
+                    }
+                }
             }
         }
-    }, [dispatch,color, id, history,successUpdate])
+        else{
+            history('/login')
+        }
+       
+    }, [dispatch,color, id, history,successUpdate,userInfo])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -75,6 +90,7 @@ function ColorEditScreen() {
                                 placeholder='Enter name'
                                 value={color_name}
                                 onChange={(e) => setColor(e.target.value)}
+                                required
                             >
                             </Form.Control>
                         </Form.Group>

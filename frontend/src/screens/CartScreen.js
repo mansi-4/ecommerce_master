@@ -39,8 +39,10 @@ function CartScreen() {
         }
     }
   return (
+    
     <Row>
       <Col md={8}>
+        
         <h1>Shopping Cart</h1>
         {cartItems.length ===0 ? (
             <Message variant="info">
@@ -51,22 +53,22 @@ function CartScreen() {
                 {cartItems.map((item)=>(
                     <ListGroup.Item key={item.product_variation_id}>
                         <Row>
-                            <Col md={2}>
-                                <Image src={`http://localhost:8003/${item.image}`} alt={item.name} fluid rounded/>
+                            <Col>
+                                <Image src={`http://localhost:8003/${item.image}`} alt={item.name} fluid rounded />
                             </Col>
-                            <Col md={3}>
+                            <Col>
                                 <Link to={`/product/${item.product_id}`}>{item.name}</Link>
                             </Col>
-                            <Col md={1}>
+                            <Col>
                             {item.color}
                             </Col>
-                            <Col md={1}>
+                            <Col>
                             {item.size}
                             </Col>
-                            <Col md={1}>
+                            <Col>
                             &#8377;{item.price}
                             </Col>
-                            <Col md={2}>
+                            <Col>
                             
                             {item.countInStock > 10 ?(
                                 <Form.Control as="select" 
@@ -127,7 +129,7 @@ function CartScreen() {
             </ListGroup.Item>
         </Card>
       </Col>
-    </Row>
+    </Row> 
   )
 }
 

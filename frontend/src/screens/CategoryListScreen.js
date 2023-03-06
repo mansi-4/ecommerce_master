@@ -8,6 +8,9 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import { listCategories,deleteCategory,createCategory } from '../actions/categoryActions'
 import {CATEGORY_CREATE_RESET} from "../constants/categoryConstants"
+import {logout} from "../actions/userAction"
+import jwt_decode from "jwt-decode";
+
 function CategoryListScreen() { 
     let history=useNavigate()
     const dispatch = useDispatch()
@@ -27,13 +30,21 @@ function CategoryListScreen() {
 
     useEffect(() => {
         dispatch({ type: CATEGORY_CREATE_RESET })
-        if (!userInfo.isAdmin) {
+        if (userInfo && userInfo.isAdmin) {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }else{
+                if (successCreate) { 
+                    history(`/admin/category/${createdCategory.id}/edit`)
+                }else {
+                    dispatch(listCategories())
+                }
+            }
+        }else{
             history('/login')
-        }
-        if (successCreate) { 
-            history(`/admin/category/${createdCategory.id}/edit`)
-        }else {
-            dispatch(listCategories())
+
         }
 
     }, [dispatch, history, successDelete,successCreate,userInfo,createdCategory])

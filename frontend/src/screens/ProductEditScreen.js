@@ -11,6 +11,9 @@ import { PRODUCT_UPDATE_RESET,PRODUCT_VARIATION_CREATE_RESET,PRODUCT_VARIATION_U
 import { listCategories } from '../actions/categoryActions'
 import { listColors } from '../actions/colorActions'
 import { listSizes } from '../actions/sizeActions'
+import {logout} from '../actions/userAction'
+import jwt_decode from "jwt-decode";
+
 function ProductEditScreen() {
     let history=useNavigate();
     const { id } = useParams();
@@ -22,6 +25,7 @@ function ProductEditScreen() {
     const [category_id, setCategoryId] = useState('')
     const [description, setDescription] = useState('')
     const [uploading, setUploading] = useState(false)
+    const [validationError,setValidationError]=useState(false)
 
     const dispatch = useDispatch()
     const categoryList = useSelector(state => state.categoryList)
@@ -59,42 +63,56 @@ function ProductEditScreen() {
 
     useEffect(() => {
         dispatch({ type: PRODUCT_VARIATION_CREATE_RESET })
-       if (successUpdate) {
-            dispatch({ type: PRODUCT_UPDATE_RESET })
-            history('/admin/productlist')
-        } else {
-            if (!product.name || product.product_id !== Number(id)) {
-                dispatch(listProductDetails(id))
-                dispatch(listProductVariationDetails(id))
-            }else if(successVariationUpdate){
-                dispatch({ type: PRODUCT_VARIATION_UPDATE_RESET })
-                dispatch({type:PRODUCT_VARIATION_DETAIL_RESET})
-                dispatch(listProductVariationDetails(id))
-                setAction("Add")
+        if (userInfo && userInfo.isAdmin) {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
             }
-            else if(Object.keys(variation).length!==0 ){
-                setProductVariation({
-                    product_id:id,
-                    product_variation_id:variation.product_variation_id,
-                    color_id:variation.color_id,
-                    size_id:variation.size_id,
-                    stock:variation.countInStock,
-                    price:variation.price 
-                })
-
-            } else {
-                setName(product.name)
-                setImage(product.image)
-                setBrand(product.brand)
-                setCategoryId(product.category_id)
-                setDescription(product.description)
-                dispatch(listCategories())
-                dispatch(listColors())
-                dispatch(listSizes())
-                dispatch(listProductVariationDetails(id))
+            else{
+                if (successUpdate) {
+                    dispatch({ type: PRODUCT_UPDATE_RESET })
+                    history('/admin/productlist')
+                } else {
+                    if (!product.name || product.product_id !== Number(id)) {
+                        dispatch(listProductDetails(id))
+                        dispatch(listProductVariationDetails(id))
+                    }else if(successVariationUpdate){
+                        dispatch({ type: PRODUCT_VARIATION_UPDATE_RESET })
+                        dispatch({type:PRODUCT_VARIATION_DETAIL_RESET})
+                        dispatch(listProductVariationDetails(id))
+                        setAction("Add")
+                    }
+                    else if(Object.keys(variation).length!==0 ){
+                        setProductVariation({
+                            product_id:id,
+                            product_variation_id:variation.product_variation_id,
+                            color_id:variation.color_id,
+                            size_id:variation.size_id,
+                            stock:variation.countInStock,
+                            price:variation.price 
+                        })
+        
+                    } else {
+                        setName(product.name)
+                        setImage(product.image)
+                        setBrand(product.brand)
+                        setCategoryId(product.category_id)
+                        setDescription(product.description)
+                        dispatch(listCategories())
+                        dispatch(listColors())
+                        dispatch(listSizes())
+                        dispatch(listProductVariationDetails(id))
+                    }
+                }
             }
         }
-    }, [dispatch,product, id, history,successUpdate,successVariationDelete,successVariationCreate,variation,successVariationUpdate])
+        else{
+            history('/login')
+
+        }
+
+    }, [dispatch,product, id, history,successUpdate,successVariationDelete,successVariationCreate,variation,successVariationUpdate,userInfo])
     const [productVariation,setProductVariation]=useState({
         product_id:id,
         product_variation_id:"",
@@ -118,29 +136,34 @@ function ProductEditScreen() {
         });
       }
       function submitVariation(){
-        switch(action){
-            case "Add":
-                dispatch(createProductVariation(productVariation)) 
-                setProductVariation({
-                    product_id:id,
-                    product_variation_id:"",
-                    color_id:"",
-                    size_id:"",
-                    stock:"",
-                    price:""
-                })
-                break;
-            case "Update":
-                dispatch(updateProductVariation(productVariation))
-                setProductVariation({
-                    product_id:id,
-                    product_variation_id:"",
-                    color_id:"",
-                    size_id:"",
-                    stock:"",
-                    price:""
-                })
-                break;
+        if(color_id === "" && size_id === "" && stock === "" && price==="" ){
+            setValidationError(true)
+        }else{
+
+            switch(action){
+                case "Add":
+                    dispatch(createProductVariation(productVariation)) 
+                    setProductVariation({
+                        product_id:id,
+                        product_variation_id:"",
+                        color_id:"",
+                        size_id:"",
+                        stock:"",
+                        price:""
+                    })
+                    break;
+                case "Update":
+                    dispatch(updateProductVariation(productVariation))
+                    setProductVariation({
+                        product_id:id,
+                        product_variation_id:"",
+                        color_id:"",
+                        size_id:"",
+                        stock:"",
+                        price:""
+                    })
+                    break;
+            }
         }
        
       }
@@ -165,32 +188,37 @@ function ProductEditScreen() {
     }
 
     const uploadFileHandler = async (e) => {
-        const file = e.target.files
-        const formData = new FormData()
-
-        formData.append('product_id', id)
-        for (let i = 0 ; i < file.length ; i++) {
-            formData.append("images", file[i]);
-        }
-        setUploading(true)
-
-        try {
-            const config = {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: userInfo.token
-                }
+        if(e.target.files.length > 5){
+            alert("you can upload images max upto 5...");
+        }else{
+            const file = e.target.files
+            const formData = new FormData()
+    
+            formData.append('product_id', id)
+            for (let i = 0 ; i < file.length ; i++) {
+                formData.append("images", file[i]);
             }
-
-            const { data } = await axios.post('/api/products/upload/', formData, config)
-
-
-            setImage(data)
-            setUploading(false)
-
-        } catch (error) {
-            setUploading(false)
+            setUploading(true)
+    
+            try {
+                const config = {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: userInfo.token
+                    }
+                }
+    
+                const { data } = await axios.post('/api/products/upload/', formData, config)
+    
+    
+                setImage(data)
+                setUploading(false)
+    
+            } catch (error) {
+                setUploading(false)
+            }
         }
+        
     }
     return (
         <div>
@@ -209,7 +237,7 @@ function ProductEditScreen() {
                             <Form.Group controlId='name'>
                                 <Form.Label>Name</Form.Label>
                                 <Form.Control
-
+                                    required
                                     type='name'
                                     placeholder='Enter name'
                                     value={name}
@@ -219,9 +247,9 @@ function ProductEditScreen() {
                             </Form.Group>
 
                             <Form.Group controlId='image'>
-                                <Form.Label>Image</Form.Label>
+                                <Form.Label>Images</Form.Label>
                                 <Form.Control
-
+                                    required
                                     type='text'
                                     placeholder='Enter image'
                                     value={image}
@@ -235,6 +263,7 @@ function ProductEditScreen() {
                                         label='Choose File'
                                         onChange={uploadFileHandler}
                                         multiple
+                                        required
                                     ></Form.Control>
                                 {uploading && <Loader />}
                             </Form.Group>
@@ -243,7 +272,7 @@ function ProductEditScreen() {
                             <Form.Group controlId='brand'>
                                 <Form.Label>Brand</Form.Label>
                                 <Form.Control
-
+                                    required
                                     type='text'
                                     placeholder='Enter brand'
                                     value={brand}
@@ -256,7 +285,7 @@ function ProductEditScreen() {
 
                             <Form.Group controlId='category'>
                                 <Form.Label>Category</Form.Label>
-                                <Form.Select  value={category_id} onChange={(e)=>setCategoryId(e.target.value)}>
+                                <Form.Select  value={category_id} onChange={(e)=>setCategoryId(e.target.value)} required>
                                     <option>Select categories</option>
                                     {categories.map((category,index)=>(
                                         <option value={category.id}>{category.category}</option>
@@ -267,8 +296,8 @@ function ProductEditScreen() {
                             <Form.Group controlId='description'>
                                 <Form.Label>Description</Form.Label>
                                 <Form.Control
-
-                                    type='text'
+                                    required
+                                    as='textarea'
                                     placeholder='Enter description'
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
@@ -293,6 +322,7 @@ function ProductEditScreen() {
                     {errorVariationCreate && <Message variant='danger'>{errorVariationCreate}</Message>}
                     {loadingVariationUpdate && <Loader />}
                     {errorVariationUpdate && <Message variant='danger'>{errorVariationUpdate}</Message>}
+                    {validationError && <Message variant='danger'>{"All fields are mandatory"}</Message>}
                     <Table striped bordered hover responsive className='table-sm'>
                         <thead>
                             <tr>                                

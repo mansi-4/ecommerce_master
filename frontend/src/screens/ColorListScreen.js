@@ -8,6 +8,9 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import { listColors,deleteColor,createColor } from '../actions/colorActions'
 import {COLOR_CREATE_RESET} from "../constants/colorConstants"
+import {logout} from "../actions/userAction"
+import jwt_decode from "jwt-decode";
+
 function ColorListScreen() {
     let history=useNavigate()
     const dispatch = useDispatch()
@@ -27,14 +30,24 @@ function ColorListScreen() {
 
     useEffect(() => {
         dispatch({ type: COLOR_CREATE_RESET })
-        if (!userInfo.isAdmin) {
+        if (userInfo && userInfo.isAdmin) {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }else{
+                if (successCreate) { 
+                    history(`/admin/color/${createdColor.id}/edit`)
+                }else {
+                    dispatch(listColors())
+                }
+            }
+        }
+        else{
             history('/login')
+
         }
-        if (successCreate) { 
-            history(`/admin/color/${createdColor.id}/edit`)
-        }else {
-            dispatch(listColors())
-        }
+
 
     }, [dispatch, history, successDelete,successCreate,userInfo,createdColor])
 

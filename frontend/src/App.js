@@ -7,6 +7,9 @@ import ProductScreen from './screens/ProductScreen'
 import CartScreen from './screens/CartScreen'
 import LoginScreen from './screens/LoginScreen'
 import RegisterScreen from './screens/RegisterScreen'
+import PasswordResetScreen from './screens/PasswordResetScreen'
+import VerifyScreen from './screens/VerifyScreen'
+import ActivateUser from './screens/ActivateUserScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import ShippingScreen from './screens/ShippingScreen'
 import PaymentScreen from './screens/PaymentScreen'
@@ -35,6 +38,9 @@ function App() {
             <Route exact path="/" element={<HomeScreen/>} />
             <Route path="/login" element={<LoginScreen/>} />
             <Route path="/register" element={<RegisterScreen/>} />
+            <Route path="/verify" element={<VerifyScreen/>} />
+            <Route path="/reset_password/:token" element={<PasswordResetScreen/>} />
+            <Route path="/user_activation/:token" element={<ActivateUser/>} />
             <Route path="/profile" element={<ProfileScreen/>} />
             <Route path="/shipping" element={<ShippingScreen/>} />
             <Route path="/payment" element={<PaymentScreen/>} />

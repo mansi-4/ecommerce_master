@@ -6,6 +6,8 @@ import FormContainer from "../components/FormContainer"
 import CheckoutSteps from "../components/CheckoutSteps"
 
 import {saveShippingAddress} from "../actions/cartActions"
+import {logout} from "../actions/userAction"
+import jwt_decode from "jwt-decode";
 
 function ShippingScreen() {
     let history = useNavigate()
@@ -16,7 +18,18 @@ function ShippingScreen() {
     const [city, setCity] = useState(shippingAddress.city)
     const [postalCode, setPostalCode] = useState(shippingAddress.postalCode)
     const [country, setCountry] = useState(shippingAddress.country)
-
+    const userLogin = useSelector(state => state.userLogin)
+    const { userInfo } = userLogin
+    useEffect(() => {
+        if(userInfo){
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }
+        }else{
+            history('/login')
+        }
+    },[userInfo])
     const submitHandler = (e) => {
         e.preventDefault()
         dispatch(saveShippingAddress({ address, city, postalCode, country }))

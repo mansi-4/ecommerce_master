@@ -8,7 +8,8 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import { listSizes,deleteSize,createSize } from '../actions/sizeActions'
 import {SIZE_CREATE_RESET} from "../constants/sizeConstants"
-
+import {logout} from '../actions/userAction'
+import jwt_decode from "jwt-decode";
 function SizeListScreen() {
     let history=useNavigate()
     const dispatch = useDispatch()
@@ -28,14 +29,22 @@ function SizeListScreen() {
 
     useEffect(() => {
         dispatch({ type: SIZE_CREATE_RESET })
-        if (!userInfo.isAdmin) {
+        if (userInfo && userInfo.isAdmin) {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }else{
+                if (successCreate) { 
+                    history(`/admin/size/${createdSize.id}/edit`)
+                }else {
+                    dispatch(listSizes())
+                }
+            }
+        } else {
             history('/login')
         }
-        if (successCreate) { 
-            history(`/admin/size/${createdSize.id}/edit`)
-        }else {
-            dispatch(listSizes())
-        }
+        
 
     }, [dispatch, history, successDelete,successCreate,userInfo,createdSize])
 

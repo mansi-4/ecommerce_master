@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import { listOrders } from '../actions/orderActions'
+import {logout} from "../actions/userAction"
+import jwt_decode from "jwt-decode";
 
 function OrderListScreen() {
     let history=useNavigate();
@@ -21,8 +23,15 @@ function OrderListScreen() {
 
     useEffect(() => {
         if (userInfo && userInfo.isAdmin) {
-            dispatch(listOrders())
-        } else {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }else{
+                dispatch(listOrders())
+            }
+        }
+        else{
             history('/login')
         }
 

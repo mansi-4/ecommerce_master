@@ -1,6 +1,6 @@
 import React from 'react'
 import {useSelector,useDispatch} from 'react-redux'
-import {Container,Navbar,Nav, NavDropdown} from 'react-bootstrap'
+import {Container,Navbar,Nav, NavDropdown,Image} from 'react-bootstrap'
 import {LinkContainer} from 'react-router-bootstrap'
 import {  } from 'react-router-dom'
 import {logout} from '../actions/userAction'
@@ -18,7 +18,9 @@ function Header() {
     <Container fluid>
         <LinkContainer to="/">
           {/* <Navbar.Brand>ProShop</Navbar.Brand> */}
-          <Navbar.Brand>Offline2online</Navbar.Brand>
+          <Navbar.Brand> 
+          Offline2online
+          </Navbar.Brand>
 
         </LinkContainer>
         <Navbar.Toggle aria-controls="navbarScroll" />

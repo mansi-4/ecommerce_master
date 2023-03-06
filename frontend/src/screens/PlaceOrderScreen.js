@@ -6,8 +6,9 @@ import Message from '../components/Message'
 import CheckoutSteps from '../components/CheckoutSteps'
 import {createOrder} from '../actions/orderActions'
 import {ORDER_CREATE_RESET} from '../constants/orderConstants'
+import {logout} from "../actions/userAction"
+import jwt_decode from "jwt-decode";
 
-import axios from 'axios'
 
 
 function PlaceOrderScreen() {
@@ -33,15 +34,26 @@ function PlaceOrderScreen() {
     }
 
     useEffect(() => {
-        if (success) {
-            // console.log(order)
-            history(`/order/${order._id}`)
-            dispatch({ type: ORDER_CREATE_RESET })
+        if(userInfo){
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }
+            else{
+                if (success) {
+                    history(`/order/${order._id}`)
+                    dispatch({ type: ORDER_CREATE_RESET })
+                }
+            }
         }
-    }, [success, history])
+        else{
+            history('/login')
+        }
+    }, [success, history,userInfo])
 
     const placeOrder = () =>{
-
+        console.log("hi")
+            
         switch (cart.paymentMethod) {
             case 'Cash On Delivery':
                 dispatch(createOrder({
@@ -58,7 +70,7 @@ function PlaceOrderScreen() {
             case 'RazorPay':
                         var options = {
                             "key": "YOUR_KEY_ID", // Enter the Key ID generated from the Dashboard
-                            "amount": cart.totalPrice, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                            "amount": cart.totalPrice * 1000, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                             "currency": "INR",
                             "name": "OFFLINE 2 ONLINE", //your business name
                             "description": "ECOMMERCE",
@@ -76,20 +88,14 @@ function PlaceOrderScreen() {
                             }
                         };
                         var rzp = new window.Razorpay(options);
-                        rzp.on('payment.failed', function (response){
-                            alert(response.error.code + "payment failed try again");
-                        });
-                        // rzp.open();
+                        // rzp.on('payment.failed', function (response){
+                        //     alert(response.error.code + "payment failed try again");
+                        // });
+                        rzp.open();
                         break;
                 }
             }
-                
-            
-
-    
-
-
-  return (
+   return (
     <div>
       <CheckoutSteps step1 step2 step3 step4 />
       <Row>
@@ -97,7 +103,6 @@ function PlaceOrderScreen() {
                 <ListGroup variant='flush'>
                     <ListGroup.Item>
                         <h2>Shipping</h2>
-
                         <p>
                             <strong>Shipping: </strong>
                             {cart.shippingAddress.address},  {cart.shippingAddress.city}
@@ -125,20 +130,20 @@ function PlaceOrderScreen() {
                                     {cart.cartItems.map((item, index) => (
                                         <ListGroup.Item key={index}>
                                             <Row>
-                                                <Col md={1}>
-                                                    <Image src= {`http://localhost:8003/${item.image}`} alt={item.name} fluid rounded />
+                                                <Col>
+                                                    <Image src= {`http://localhost:8003/${item.image}`} alt={item.name} fluid rounded style={{width:"100px"}} />
                                                 </Col>
 
                                                 <Col >
                                                     <Link to={`/product/${item.product}`}>{item.name}</Link>
                                                 </Col>
-                                                <Col md={1}>
+                                                <Col>
                                                     {item.color}
                                                 </Col>
-                                                <Col md={1}>
+                                                <Col>
                                                     {item.size}
                                                 </Col>
-                                                <Col md={4}>
+                                                <Col>
                                                     {item.qty} X &#8377;{item.price} = &#8377;{(item.qty * item.price).toFixed(2)}
                                                 </Col>
                                             </Row>
@@ -186,12 +191,14 @@ function PlaceOrderScreen() {
                                 </Row>
                             </ListGroup.Item>
 
-
-                            <ListGroup.Item>
+                            {error?(
+                                <ListGroup.Item>
                                 {error && <Message variant='danger'>{error}</Message>}
                             </ListGroup.Item>
+                            ):("")}            
+                            
 
-                            <ListGroup.Item>
+                            <ListGroup.Item className='text-center m-2'>
                                 <Button
                                     type='button'
                                     className='btn-block'

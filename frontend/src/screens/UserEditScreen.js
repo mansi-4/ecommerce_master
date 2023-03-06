@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import FormContainer from '../components/FormContainer'
-import { getUserDetails, updateUser } from '../actions/userAction'
+import { getUserDetails, updateUser ,logout} from '../actions/userAction'
 import { USER_UPDATE_RESET } from '../constants/userConstants'
+import jwt_decode from "jwt-decode";
 
 function UserEditScreen() {
     let history=useNavigate()
@@ -25,23 +26,36 @@ function UserEditScreen() {
 
     const userUpdate = useSelector(state => state.userUpdate)
     const { error: errorUpdate, loading: loadingUpdate, success: successUpdate } = userUpdate
-    useEffect(() => {
-    
-        if (successUpdate) {
-            dispatch({ type: USER_UPDATE_RESET })
-            history('/admin/userlist')
-        } else {
 
-            if (!user.name || user.user_id !== Number(id)) {
-                dispatch(getUserDetails(id))
-            } else {
-                setName(user.name)
-                setEmail(user.email)
-                setIsAdmin(user.isAdmin)
+    const userLogin = useSelector(state => state.userLogin)
+    const { userInfo } = userLogin
+    useEffect(() => {
+        if (userInfo && userInfo.isAdmin) {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
             }
+            else{
+                if (successUpdate) {
+                    dispatch({ type: USER_UPDATE_RESET })
+                    history('/admin/userlist')
+                } else {
+
+                    if (!user.name || user.user_id !== Number(id)) {
+                        dispatch(getUserDetails(id))
+                    } else {
+                        setName(user.name)
+                        setEmail(user.email)
+                        setIsAdmin(user.isAdmin)
+                    }
+                }
+            }
+        } else {
+            history('/login')
         }
 
-    }, [user, id, successUpdate, history])
+    }, [user, id, successUpdate, history,userInfo])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -66,7 +80,7 @@ function UserEditScreen() {
                             <Form.Group controlId='name'>
                                 <Form.Label>Name</Form.Label>
                                 <Form.Control
-
+                                    required
                                     type='name'
                                     placeholder='Enter name'
                                     value={name}
@@ -82,6 +96,7 @@ function UserEditScreen() {
                                     placeholder='Enter Email'
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                    required
                                 >
                                 </Form.Control>
                             </Form.Group>
@@ -92,6 +107,7 @@ function UserEditScreen() {
                                     label='Is Admin'
                                     checked={isAdmin}
                                     onChange={(e) => setIsAdmin(e.target.checked)}
+                                    required
                                 >
                                 </Form.Check>
                             </Form.Group>

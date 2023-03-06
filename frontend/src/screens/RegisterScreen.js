@@ -19,19 +19,18 @@ function RegisterScreen() {
     const [message,setMessage] = useState("")
 
     
-    const redirect = searchParms.get("redirect") ? searchParms.get("redirect") : '/';
+    // const redirect = searchParms.get("redirect") ? searchParms.get("redirect") : '/';
 
     // getting the state of userLogin from store for that we are using useSelector hook
     const userRegister=useSelector(state => state.userRegister)
     // destructuring the response what we get from reducer
-    const {error,loading,userInfo} = userRegister
+    const {error,loading,success} = userRegister
 
     useEffect(()=>{
-        // if user is logged in then he should not see login page
-        if(userInfo){
-            history(redirect)
-        }
-    },[history,userInfo,redirect])
+        // if(success){
+        //     history('/login')
+        // }
+    },[history,success])
 
     // to submit data using useDispatch
     const dispatch= useDispatch()
@@ -39,6 +38,9 @@ function RegisterScreen() {
         e.preventDefault()
         if(password!=confirmPassword){
             setMessage("Passwords do not match")
+        }
+        else if(password.length < 6){
+            setMessage("Password must be greater than 6 characters")
         }
         else{
         dispatch(register(name,email,password))
@@ -52,6 +54,7 @@ function RegisterScreen() {
         {message && <Message variant='danger'>{message}</Message>}
         {error && <Message variant='danger'>{error}</Message>}
         {loading && <Loader />}
+        {success && <Message variant='info'>{success}</Message>}
         <Form onSubmit={submitHandler}>
 
             <Form.Group controlId='name'>
@@ -62,6 +65,7 @@ function RegisterScreen() {
                     placeholder='Enter name'
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    
                 >
                 </Form.Control>
             </Form.Group>
@@ -74,6 +78,7 @@ function RegisterScreen() {
                     placeholder='Enter Email'
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    
                 >
                 </Form.Control>
             </Form.Group>
@@ -81,11 +86,12 @@ function RegisterScreen() {
             <Form.Group controlId='password'>
                 <Form.Label>Password</Form.Label>
                 <Form.Control
-                    required
+                    
                     type='password'
                     placeholder='Enter Password'
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required
                 >
                 </Form.Control>
             </Form.Group>
@@ -110,7 +116,7 @@ function RegisterScreen() {
         <Row className='py-3'>
             <Col>
                 Have an Account? <Link
-                    to={redirect ? `/login?redirect=${redirect}` : '/login'}>
+                    to={'/login'}>
                     Sign In
                     </Link>
             </Col>

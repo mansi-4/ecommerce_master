@@ -7,6 +7,8 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import { listProducts,deleteProduct,createProduct } from '../actions/productActions'
 import { PRODUCT_CREATE_RESET } from '../constants/productConstants'
+import {logout} from "../actions/userAction"
+import jwt_decode from "jwt-decode";
 
 function ProductListScreen() {
     let history=useNavigate()
@@ -26,13 +28,21 @@ function ProductListScreen() {
 
     useEffect(() => {
         dispatch({ type: PRODUCT_CREATE_RESET })
-        if (!userInfo.isAdmin) {
-            history('/login')
+        if (userInfo && userInfo.isAdmin) {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }else{
+                if (successCreate) {
+                    history(`/admin/product/${createdProduct.product_id}/edit`)
+                } else {
+                    dispatch(listProducts())
+                }
+            }
         }
-        if (successCreate) {
-            history(`/admin/product/${createdProduct.product_id}/edit`)
-        } else {
-            dispatch(listProducts())
+        else{
+            history('/login')
         }
 
     }, [dispatch, history,userInfo,successDelete,successCreate, createdProduct])

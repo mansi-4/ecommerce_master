@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Row, Col, ListGroup, Image, Card,Form } from 'react-bootstrap'
+import { Button, Row, Col, ListGroup, Image, Card,Form, Collapse } from 'react-bootstrap'
 import { Link ,useNavigate,useParams} from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Message from '../components/Message'
 import Loader from "../components/Loader"
 import {getOrderDetails,payOrder,deliverOrder} from '../actions/orderActions'
 import { ORDER_PAY_RESET,ORDER_DELIVER_RESET} from '../constants/orderConstants'
+import {logout} from "../actions/userAction"
+import jwt_decode from "jwt-decode";
+import axios from 'axios'
+import jsPDF from "jspdf"
+
 function OrderScreen() {
     const { id } = useParams();
     let history=useNavigate()
@@ -21,27 +26,40 @@ function OrderScreen() {
     const userLogin = useSelector(state => state.userLogin)
     const { userInfo } = userLogin
 
+    const [invoiceLoading,setinvoiceLoading]=useState(false)
+    const [createdAt,setCreatedAt]=useState("")
     const dispatch=useDispatch();
     if(!loading && !error){
         order.itemsPrice = order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0).toFixed(2)
+        // typeof(order.createdAt)
+        // const date=order.createdAt.toISOString().split( "T" )
+        // setCreatedAt(date[0])
     }
+
     const [shipping_status,setShippingStatus]=useState("")
     useEffect(() => {
-        if(!userInfo){
-            history("/login")
-        }
-        else{
-            if(!order || order._id!==Number(id) || successDeliver || successPay){
-                dispatch({ type: ORDER_PAY_RESET }) 
-                dispatch({ type: ORDER_DELIVER_RESET })
-                dispatch(getOrderDetails(id))
+        if (userInfo) {
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
             }
             else{
-                setShippingStatus(order.shipping_status)
+                if(!order || order._id!==Number(id) || successDeliver || successPay){
+                    dispatch({ type: ORDER_PAY_RESET }) 
+                    dispatch({ type: ORDER_DELIVER_RESET })
+                    dispatch(getOrderDetails(id))
+                }
+                else{
+                    setShippingStatus(order.shipping_status)
+                }
             }
         }
+        else{
+            history("/login")
+        }
         
-    }, [order,id,successDeliver,successPay])
+    }, [order,id,successDeliver,successPay,userInfo])
     
     const deliverHandler = (e) => {
         setShippingStatus(e.target.value)
@@ -54,16 +72,72 @@ function OrderScreen() {
         dispatch(payOrder(id))
     }
 
+    function downloadInvoice(){
+        try{
+            setinvoiceLoading(true)
+            const Hide=document.getElementsByClassName("Hide")
+            for (var i=0;i<Hide.length;i++){
+                Hide[i].hidden=true
+            }
+            // Hide.hidden=true
+            var htmlreport = document.querySelector("#htmlpdfreport").innerHTML; 
+            axios .post( "http://localhost:8003/api/orders/invoice/", JSON.stringify(htmlreport), 
+            { 
+                responseType: "blob" 
+            }) 
+            .then(response => 
+                { 
+                    var url = window.URL.createObjectURL( new Blob([response.data], { type: "application/pdf" }) ),
+                    anchor = document.createElement("a"); anchor.href = url; 
+                    anchor.download = "invoice.pdf"; 
+                    anchor.click(); 
+                    setinvoiceLoading(false)
+                    const Hide=document.getElementsByClassName("Hide")
+                    for (var i=0;i<Hide.length;i++){
+                        Hide[i].hidden=false
+                    }
+                });
+        }catch(error){
+            setinvoiceLoading(false)
+        }
+        
+
+    }
+
 
   return loading ? (
             <Loader />
         ) : error ? (
             <Message variant='danger'>{error}</Message>
         ) : (
-            <div>
+            <>
+            {order.isDelivered ? (
+                invoiceLoading?(
+                    <Loader/>
+                ):(
+
+                    <Button
+                    type='button'
+                    className='float-end btn btn-sm'
+                    onClick={downloadInvoice}
+                    >
+                    Download Invoice
+                    </Button>
+                )
+            ):("")}
+            
+            <div id="htmlpdfreport">
+                <h1 className='text-center'>
+                    Offline2Online</h1>
+                    {/* <Image src={`http://localhost:8003/static/multimedia/shopping.png`}  width="30px"/>                     */}
                 <h1>Order: {order._id}</h1>
             <Row>
                     <Col md={8}>
+                        <ListGroup variant='flush'>
+                            <ListGroup.Item>
+                                <h4>Order Date: {order.createdAt.split("T")[0]}</h4>
+                            </ListGroup.Item>        
+                        </ListGroup>
                         <ListGroup variant='flush'>
                             <ListGroup.Item>
                                 <h2>Shipping</h2>
@@ -108,8 +182,8 @@ function OrderScreen() {
                                             {order.orderItems.map((item, index) => (
                                                 <ListGroup.Item key={index}>
                                                     <Row> 
-                                                        <Col md={1}>
-                                                            <Image src={`http://localhost:8003/${item.image}`} alt={item.name} fluid rounded />
+                                                        <Col>
+                                                            <Image src={`http://localhost:8003/${item.image}`} alt={item.name} fluid rounded style={{width:"100px"}}/>
                                                         </Col>
 
                                                         <Col>
@@ -124,11 +198,12 @@ function OrderScreen() {
                                                             {item.size}
                                                         </Col>
 
-                                                        <Col md={4}>
+                                                        <Col>
                                                             {item.qty} X &#8377;{item.price} = &#8377;{(item.qty * item.price).toFixed(2)}
                                                         </Col>
                                                     </Row>
                                                 </ListGroup.Item>
+                                               
                                             ))}
                                         </ListGroup>
                                     )}
@@ -138,6 +213,8 @@ function OrderScreen() {
 
                     </Col>
                     <Col md={4}>
+                        
+                
                             <Card>
                                 <ListGroup variant='flush'>
                                     <ListGroup.Item>
@@ -177,8 +254,8 @@ function OrderScreen() {
                                 
                                 {/* paid buttons will come here */}
                                 {loadingPay && <Loader />}
-                                {userInfo && userInfo.isAdmin && !order.isPaid && (
-                                    <ListGroup.Item className="text-center">
+                                {userInfo && userInfo.isAdmin && order.paymentMethod==="Cash On Delivery" && (
+                                    <ListGroup.Item className="text-center Hide" > 
                                         <Button
                                             type='button'
                                             className='btn btn-block m-3'
@@ -188,23 +265,11 @@ function OrderScreen() {
                                         </Button>
                                     </ListGroup.Item>
                                 )}
-                                {/* deliver buttons will come here */}
-                                {loadingDeliver && <Loader />}
-                                {userInfo && userInfo.isAdmin && !order.isDelivered && (
-                                    <ListGroup.Item className="text-center">
-                                        <Button
-                                            type='button'
-                                            className='btn btn-block'
-                                            onClick={deliverHandler}
-                                        >
-                                            Mark As Delivered
-                                        </Button>
-                                    </ListGroup.Item>
-                                )}
+                                
                             </Card>
                             <br></br>
                             {userInfo && userInfo.isAdmin && !order.isDelivered && (<Card>
-                                <ListGroup variant='flush'>
+                                <ListGroup variant='flush' className="Hide">
                                     <ListGroup.Item>
                                         <h2>Shipping Status</h2>
                                     </ListGroup.Item>
@@ -233,7 +298,10 @@ function OrderScreen() {
                             
                     </Col>
             </Row>
+            
+            
             </div>
+            </>
         )
   
 }

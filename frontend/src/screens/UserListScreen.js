@@ -5,7 +5,8 @@ import { Table, Button } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
-import { listUsers,deleteUser } from '../actions/userAction'
+import { listUsers,deleteUser,logout } from '../actions/userAction'
+import jwt_decode from "jwt-decode";
 
 function UserListScreen() {
     let history=useNavigate()
@@ -24,6 +25,11 @@ function UserListScreen() {
     useEffect(() => {
         if (userInfo && userInfo.isAdmin) {
             dispatch(listUsers())
+            // to check if token is expired or not 
+            var decodedHeader=jwt_decode(userInfo.token)
+            if(decodedHeader.exp*1000 < Date.now()){
+                dispatch(logout())
+            }
         } else {
             history('/login')
         }
