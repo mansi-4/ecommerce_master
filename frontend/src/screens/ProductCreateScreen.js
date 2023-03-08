@@ -149,9 +149,9 @@ function ProductCreateScreen() {
             formData.append('category_id', category_id);
             formData.append('description', description);
             formData.append('productVariations', JSON.stringify(variationsListArr));
-            // dispatch(createProduct(
-            //     formData
-            // ))
+            dispatch(createProduct(
+                formData
+            ))
         }
     }
     return (
