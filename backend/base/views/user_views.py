@@ -197,7 +197,7 @@ def registerUser(request):
                     Please note that this activation link is valid only upto 1 hour. \n
                     After you activate your account, you will be able to login.\n 
                     Thanks & Regards, 
-                    Offline2Online Team.
+                    OfflineToOnline Team.
 
                 ''',
                 from_email=settings.EMAIL_HOST_USER,
@@ -222,7 +222,7 @@ def verifyUser(request):
         
         payload = {
             'id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=10),
             'iat': datetime.datetime.utcnow()
         }
 
@@ -235,9 +235,10 @@ def verifyUser(request):
                     You recently requested to reset the password for your Offline2Online account.\n 
                     Click the link below to proceed.\n
                     http://localhost:3000/reset_password/{token} \n 
+                    Please note that this activation link is valid only upto 1 hour. \n
                     If you did not request a password reset, please ignore this email or reply to let us know.\n 
                     Thanks & Regards, 
-                    Offline2Online Team.
+                    OfflineToOnline Team.
                 ''',
                 from_email=settings.EMAIL_HOST_USER,
                 recipient_list=[email],

@@ -19,7 +19,7 @@ function Header() {
         <LinkContainer to="/">
           {/* <Navbar.Brand>ProShop</Navbar.Brand> */}
           <Navbar.Brand> 
-          Offline2online
+          Offlinetoonline
           </Navbar.Brand>
 
         </LinkContainer>

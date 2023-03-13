@@ -5,7 +5,7 @@ function Footer() {
     <footer>
       <Container>
             <Row>
-                <Col className="text-center py-3">Copyright &copy; Offline2Online</Col>
+                <Col className="text-center py-3">Copyright &copy; OfflineToOnline</Col>
             </Row>
         </Container>
     </footer>
