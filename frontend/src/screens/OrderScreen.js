@@ -128,7 +128,7 @@ function OrderScreen() {
             
             <div id="htmlpdfreport">
                 <h1 className='text-center'>
-                    Offline2Online</h1>
+                    OfflineToOnline</h1>
                     {/* <Image src={`http://localhost:8003/static/multimedia/shopping.png`}  width="30px"/>                     */}
                 <h1>Order: {order._id}</h1>
             <Row>
